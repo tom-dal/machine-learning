@@ -5,6 +5,10 @@ public class InputCouple {
 	private double input;
 	private double weight;
 	
+	public InputCouple() {
+		
+	}
+	
 	public InputCouple(double input, double weight) {
 		super();
 		this.input = input;

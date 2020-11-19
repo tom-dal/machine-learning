@@ -38,6 +38,14 @@ public abstract class Layer {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Number of neurons: ");
+		builder.append(neurons.size());
+		return builder.toString();
+	}
 	
 	
 

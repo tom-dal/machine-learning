@@ -3,15 +3,18 @@ package neuralnetorks.builder;
 import neuralnetorks.function.ActivationFunction;
 import neuralnetorks.model.DenseLayer;
 import neuralnetorks.model.FullyConnectedNetwork;
-import neuralnetorks.model.Layer;
 import neuralnetorks.model.Network;
 
 public class NetworkBuilder {
 	
 	protected Network network;
 	
-	public FullyConnectedNetwork getFullyConnectedNetwork() {
-		return new FullyConnectedNetwork();
+	public NetworkBuilder(){
+		this.network = new FullyConnectedNetwork();
+	}
+	
+	public Network getNetwork() {
+		return this.network;
 	}
 	
 	public NetworkBuilder addDenseLayer(int neuronsNumber) {
