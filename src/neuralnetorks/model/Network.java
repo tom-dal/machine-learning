@@ -3,43 +3,27 @@ package neuralnetorks.model;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public abstract class Network {
 	
-	protected double[] inputData;
-	protected List<Layer> layers = new LinkedList<>();
+	protected LinkedList<Layer> layers = new LinkedList<>();
+	private int inputSize;
 
-	public List<Layer> getLayers() {
+	public LinkedList<Layer> getLayers() {
 		return layers;
 	}
 
-	public void setLayers(List<Layer> layers) {
+	public void setLayers(LinkedList<Layer> layers) {
 		this.layers = layers;
 	}
-
-	public double[] getInputLayer() {
-		return inputData;
-	}
-
-	public void setInputData(double[] inputData) {
-		this.inputData = inputData;
-	}
 	
-	public void initialize(double[] inputData) {
-		this.inputData = inputData;
-		layers.forEach(layer -> {
-			layer.getNeurons().forEach(neuron ->{
-				neuron.initializeInputCouples(inputData.length);
-			});
-		});
-	}
-
 	@Override
 	public String toString() {
 		int layerNumber = 0;
 		StringBuilder builder = new StringBuilder();
 		builder.append("Network [Input size=");
-		builder.append(inputData.length);
+		builder.append(inputSize);
 		for (Layer layer : layers) {
 			builder.append(", layer #");
 			layerNumber++;
@@ -48,6 +32,14 @@ public abstract class Network {
 		}
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public void setInputSize(int inputSize) {
+		this.inputSize=inputSize;
+	}
+	
+	public int getInputSize() {
+		return this.inputSize;
 	}
 	
 	

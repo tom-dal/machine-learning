@@ -16,4 +16,9 @@ public class DenseLayer extends Layer{
 		this.neurons = Stream.generate(() -> new Neuron(activationFunction)).limit(neuronsNumber).collect(Collectors.toSet());
 	}
 
+	@Override
+	public double[] process(double[] input) {
+		return this.getNeurons().stream().mapToDouble(neuron -> neuron.processOutput(input)).toArray();
+	}
+
 }

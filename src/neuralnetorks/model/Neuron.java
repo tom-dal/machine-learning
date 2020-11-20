@@ -1,6 +1,9 @@
 package neuralnetorks.model;
 
 
+
+import java.util.Arrays;
+import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import neuralnetorks.function.ActivationFunction;
@@ -8,10 +11,9 @@ import neuralnetorks.utils.MathUtils;
 
 public class Neuron {
 	
-	private InputCouple[] inputs;
+	private double[] weights;
 	private double bias;
 	private ActivationFunction activationFunction;
-	private double output;
 	
 	public Neuron() {
 		
@@ -28,29 +30,30 @@ public class Neuron {
 		this.bias = bias;
 	}
 	
-	public double processOutput() {
-		output = 0;
-		for (InputCouple inputCouple : inputs) {
-			output+= (inputCouple.getInput()*inputCouple.getWeight());
+	public double processOutput(double[] inputs) {
+		double output = 0;
+		for (int i = 0; i < inputs.length; i++) {
+			output += (inputs[i]*weights[i]);
 		}
 		return activationFunction==null? output : activationFunction.processOutput(output);
 	}
 	
-	public InputCouple[] getInputs() {
-		return inputs;
+
+	public double[] getWeights() {
+		return weights;
 	}
 
-	public void setInputs(InputCouple[] inputs) {
-		this.inputs = inputs;
+	public void setWeights(double[] weights) {
+		this.weights = weights;
 	}
 
-	public void initializeInputCouples(int inputSize) {
-		InputCouple[] inputCouples = new InputCouple[inputSize];
-		for (int i = 0; i < inputCouples.length; i++) {
-			inputCouples[i] = new InputCouple();
-			inputCouples[i].setWeight(MathUtils.random.nextDouble());
-		}
-		
+	public void setRandomWeights(int inputSize) {
+		this.weights = new double[inputSize];
+		this.weights = Arrays.stream(new double[this.weights.length]).map(d -> d=MathUtils.random.nextDouble()).toArray();
+	}
+
+	public void setRandomBias() {
+		this.bias = MathUtils.getRandomDouble();
 	}
 	
 

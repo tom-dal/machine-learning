@@ -5,6 +5,26 @@ import java.util.Set;
 public abstract class Layer {
 	
 	protected Set<Neuron> neurons;
+	
+	protected Layer previous;
+	protected Layer next;
+	private boolean outputLayer = Boolean.FALSE;
+
+	public Layer getPrevious() {
+		return previous;
+	}
+
+	public void setPrevious(Layer previous) {
+		this.previous = previous;
+	}
+
+	public Layer getNext() {
+		return next;
+	}
+
+	public void setNext(Layer next) {
+		this.next = next;
+	}
 
 	public Set<Neuron> getNeurons() {
 		return neurons;
@@ -45,6 +65,16 @@ public abstract class Layer {
 		builder.append("Number of neurons: ");
 		builder.append(neurons.size());
 		return builder.toString();
+	}
+
+	public abstract double[] process(double[] input);
+
+	public boolean isOutputLayer() {
+		return outputLayer;
+	}
+
+	public void setOutputLayer(boolean outputLayer) {
+		this.outputLayer = outputLayer;
 	}
 	
 	
