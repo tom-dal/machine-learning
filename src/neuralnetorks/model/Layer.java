@@ -1,10 +1,11 @@
 package neuralnetorks.model;
 
+import java.util.Map;
 import java.util.Set;
 
 public abstract class Layer {
 	
-	protected Set<Neuron> neurons;
+	protected Map<Long, Neuron> neurons;
 	
 	protected Layer previous;
 	protected Layer next;
@@ -26,11 +27,11 @@ public abstract class Layer {
 		this.next = next;
 	}
 
-	public Set<Neuron> getNeurons() {
+	public Map<Long,Neuron> getNeurons() {
 		return neurons;
 	}
 
-	public void setNeurons(Set<Neuron> neurons) {
+	public void setNeurons(Map<Long, Neuron> neurons) {
 		this.neurons = neurons;
 	}
 

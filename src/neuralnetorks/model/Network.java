@@ -28,7 +28,7 @@ public abstract class Network {
 			builder.append(", layer #");
 			layerNumber++;
 			builder.append(layerNumber+":");
-			builder.append(layer);
+			builder.append(layer.toString());
 		}
 		builder.append("]");
 		return builder.toString();

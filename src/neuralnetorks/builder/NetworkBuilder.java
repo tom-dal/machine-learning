@@ -22,7 +22,7 @@ public class NetworkBuilder {
 		this.network.getLayers().forEach(layer -> {
 									if(layer.getPrevious()!=null) {
 										int previousNeuronsNumber = layer.getPrevious().getNeurons().size();
-										layer.getNeurons().forEach(neuron -> {
+										layer.getNeurons().forEach( (a,neuron) -> {
 											neuron.setRandomWeights(previousNeuronsNumber);
 											neuron.setRandomBias();
 										});
@@ -41,10 +41,6 @@ public class NetworkBuilder {
 		return this;
 	}
 	
-	public NetworkBuilder addDenseLayer(int neuronsNumber, ActivationFunction activationFunction) {
-		this.network.getLayers().add(new DenseLayer(neuronsNumber, activationFunction));
-		return this;
-	}
 	
 	public NetworkBuilder setInputSize(int inputSize) {
 		this.network.setInputSize(inputSize);

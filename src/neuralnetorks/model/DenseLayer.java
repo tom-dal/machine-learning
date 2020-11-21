@@ -1,20 +1,26 @@
 package neuralnetorks.model;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import neuralnetorks.function.ActivationFunction;
+import neuralnetorks.utils.HashUtil;
 
 public class DenseLayer extends Layer{
 	
 	
 	public DenseLayer(int neuronsNumber) {
-		this.neurons = Stream.generate(()->new Neuron()).limit(neuronsNumber).collect(Collectors.toSet());
+//		this.neurons = Stream.generate(()->new Neuron()).limit(neuronsNumber).collect(Collectors.toSet());
+		this.neurons = new HashMap<>();
+		for (int i = 0; i < neuronsNumber; i++) {
+			Neuron neuron = new Neuron();
+			this.neurons.put(HashUtil.getNewHashCode(), neuron);
+		}
 	}
 	
-	public DenseLayer(int neuronsNumber, ActivationFunction activationFunction) {
-		this.neurons = Stream.generate(() -> new Neuron(activationFunction)).limit(neuronsNumber).collect(Collectors.toSet());
-	}
 
 	@Override
 	public double[] process(double[] input) {

@@ -62,14 +62,19 @@ public class Test {
 		NetworkBuilder builder = new NetworkBuilder();
 		
 		builder.addDenseLayer(10)
-		.addDenseLayer(10).addDenseLayer(1).setInputSize(1).initialize();
+		.addDenseLayer(5).addDenseLayer(1).setInputSize(1).initialize();
 		
 		Network fcn = builder.getNetwork();
 		
 		LearningCore lc = new LearningCore();
 		lc.setLearningRate(0.01);
 		lc.setErrorFunction(ErrorFunctions.MEAN_SQUARED_ERROR);
-		lc.teach(fcn, inputData, targetData, 50);
+//		lc.teach(fcn, inputData, targetData, 50);
+		
+		
+		Network cloneNetwork = lc.cloneNetwork(fcn);
+		System.out.println(fcn.toString());
+		System.out.println(cloneNetwork.toString());
 		
 	}
 

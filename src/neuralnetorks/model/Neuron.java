@@ -13,14 +13,9 @@ public class Neuron {
 	
 	private double[] weights;
 	private double bias;
-	private ActivationFunction activationFunction;
 	
 	public Neuron() {
 		
-	}
-	
-	public Neuron(ActivationFunction activationFunction) {
-		this.activationFunction=activationFunction;
 	}
 	
 	public double getBias() {
@@ -33,9 +28,9 @@ public class Neuron {
 	public double processOutput(double[] inputs) {
 		double output = 0;
 		for (int i = 0; i < inputs.length; i++) {
-			output += (inputs[i]*weights[i]);
+			output += (inputs[i]*weights[i] + bias);
 		}
-		return activationFunction==null? output : activationFunction.processOutput(output);
+		return output;
 	}
 	
 
@@ -55,6 +50,35 @@ public class Neuron {
 	public void setRandomBias() {
 		this.bias = MathUtils.getRandomDouble();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(bias);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + Arrays.hashCode(weights);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Neuron other = (Neuron) obj;
+		if (Double.doubleToLongBits(bias) != Double.doubleToLongBits(other.bias))
+			return false;
+		if (!Arrays.equals(weights, other.weights))
+			return false;
+		return true;
+	}
+	
+	
 	
 
 }
