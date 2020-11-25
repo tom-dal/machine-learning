@@ -1,13 +1,24 @@
 package neuralnetorks;
 
+
+
+
+
 import neuralnetorks.LearningCore.ErrorFunctions;
 import neuralnetorks.builder.NetworkBuilder;
+import neuralnetorks.model.Models;
 import neuralnetorks.model.Network;
-import neuralnetorks.model.Neuron;
+import neuralnetorks.utils.MathUtils;
 
 public class Test {
+	
+	
+	
 
 	public static void main(String[] args) {
+		
+		
+	
 		
 		double[] inputData = {1971, 1972, 1973, 1973, 1974, 1974, 1974, 1975, 1976, 1976, 1976,
 		                       1978, 1978, 1979, 1979, 1979, 1981, 1982, 1982, 1983, 1984, 1984,
@@ -59,23 +70,36 @@ public class Test {
 	       10000000000.,  4300000000., 18000000000., 19200000000.,  8876000000.,
 	       23600000000.,  9000000000. };
 		
-		NetworkBuilder builder = new NetworkBuilder();
 		
-		builder.addDenseLayer(10)
-		.addDenseLayer(5).addDenseLayer(1).setInputSize(1).initialize();
+		NetworkBuilder builder = new NetworkBuilder(Models.LINEAR_REGRESSION);
 		
-		Network fcn = builder.getNetwork();
+		builder.addLayer(5).addLayer(5).addLayer(1).setInputSize(1).setNetworkName("Asghenauei").initialize();
 		
-		LearningCore lc = new LearningCore();
-		lc.setLearningRate(0.01);
-		lc.setErrorFunction(ErrorFunctions.MEAN_SQUARED_ERROR);
-//		lc.teach(fcn, inputData, targetData, 50);
+//		Network fcn = builder.getNetwork();
+//		
+//		LearningCore lc = new LearningCore();
+//		Network clonedNetwork = lc.cloneNetwork(fcn);
+//		
+//
+//		
+//		
+//		lc.setLearningRate(0.001);
+//		lc.setErrorFunction(ErrorFunctions.MEAN_SQUARED_ERROR); 
+//		double[][] inputDataArray = new double[inputData.length][];
+//		for (int i = 0; i < inputDataArray.length; i++) {
+//			inputDataArray[i] = MathUtils.doubleToArray(inputData[i]);
+//		}
+//		
+//		
+//		lc.teach(fcn, inputDataArray, targetData,1);
+//		
+//		
+//		Network cloneNetwork = lc.cloneNetwork(fcn);
+//		System.out.println(fcn.toString());
+//		System.out.println(cloneNetwork.toString());
 		
 		
-		Network cloneNetwork = lc.cloneNetwork(fcn);
-		System.out.println(fcn.toString());
-		System.out.println(cloneNetwork.toString());
-		
+
 	}
 
 		
