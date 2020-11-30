@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import neuralnetorks.model.Link;
+import neuralnetorks.model.layer.Layer;
 import neuralnetorks.utils.IdUtil;
+import neuralnetorks.utils.MathUtilities;
 
 public abstract class AbstractNeuron {
 
@@ -12,11 +14,22 @@ public abstract class AbstractNeuron {
 
 	protected List<Link> inLinks = new ArrayList<>();
 	protected List<Link> outLinks = new ArrayList<>();
+	
+	protected Layer layer;
 
-	private double bias;
+	public Layer getLayer() {
+		return layer;
+	}
+
+	public void setLayer(Layer layer) {
+		this.layer = layer;
+	}
+
+	protected double bias;
 
 	public AbstractNeuron() {
 		this.id = IdUtil.getNewId();
+		this.bias = MathUtilities.getRandomDouble();
 	}
 
 	public List<Link> getInLinks() {

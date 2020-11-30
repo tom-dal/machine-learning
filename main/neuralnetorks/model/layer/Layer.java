@@ -1,9 +1,13 @@
 package neuralnetorks.model.layer;
 
+import java.util.Arrays;
+
 import neuralnetorks.model.neuron.Neuron;
 import neuralnetorks.utils.IdUtil;
 
 public class Layer extends AbstractLayer {
+	
+	private Long id;
 	
 	private Neuron[] neurons;
 	private Layer previous;
@@ -12,11 +16,12 @@ public class Layer extends AbstractLayer {
 	
 	
 	public Layer(int neuronsNumber) {
-		this.id = IdUtil.getNewId();
 		this.neurons = new Neuron[neuronsNumber];
 		for (int i = 0; i < neurons.length; i++) {
 			neurons[i] = new Neuron();
 		}
+		Arrays.stream(neurons).forEach(n -> n.setLayer(this));
+		this.id = IdUtil.getNextLayerNumber();
 	}
 
 
@@ -45,6 +50,20 @@ public class Layer extends AbstractLayer {
 	
 	public Neuron[] getNeurons() {
 		return neurons;
+	}
+	
+	public void process() {
+		Arrays.stream(this.neurons).forEach(neuron -> neuron.process());
+	}
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 }

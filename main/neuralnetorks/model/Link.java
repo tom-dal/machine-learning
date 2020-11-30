@@ -8,7 +8,8 @@ public class Link {
 	private AbstractNeuron toNeuron;
 	private double weight;
 	private double value;
-
+	private double nextWeight;
+	
 
 	public AbstractNeuron getFromNeuron() {
 		return fromNeuron;
@@ -48,8 +49,23 @@ public class Link {
 	public void setValue(double value) {
 		this.value = value;
 	}
+
+
+	public double getNextWeight() {
+		return nextWeight;
+	}
+
+
+	public void setNextWeight(double nextWeight) {
+		this.nextWeight = nextWeight;
+	}
 	
-	
+	public void updateWeight() {
+		this.weight = nextWeight;
+		
+	}
+
+
 
 	
 

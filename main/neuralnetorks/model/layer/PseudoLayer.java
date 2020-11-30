@@ -1,15 +1,15 @@
 package neuralnetorks.model.layer;
 
 
+import java.util.Arrays;
+
 import neuralnetorks.model.neuron.PseudoNeuron;
-import neuralnetorks.utils.IdUtil;
 
 public class PseudoLayer extends AbstractLayer {
 
 	private PseudoNeuron[] pseudoNeurons;	
 	
 	public PseudoLayer(int paramsNumber) {
-		this.id = IdUtil.getNewId();
 		this.pseudoNeurons = new PseudoNeuron[paramsNumber];
 		for (int i = 0; i < pseudoNeurons.length; i++) {
 			pseudoNeurons[i] = new PseudoNeuron();
@@ -18,6 +18,10 @@ public class PseudoLayer extends AbstractLayer {
 
 	public PseudoNeuron[] getPseudoNeurons() {
 		return pseudoNeurons;
+	}
+
+	public void process() {
+		Arrays.stream(this.pseudoNeurons).forEach(neuron -> neuron.process());
 	}
 
 	

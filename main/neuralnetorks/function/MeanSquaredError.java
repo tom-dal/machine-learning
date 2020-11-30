@@ -1,12 +1,13 @@
 package neuralnetorks.function;
 
-import neuralnetorks.utils.MathUtils;
+import neuralnetorks.utils.MathUtilities;
 
 public class MeanSquaredError implements ErrorFunction {
 
 	@Override
-	public double getError(double[][] predicted, double[] actual) {
-		return MathUtils.meanSquaredError(predicted, actual);
+	public double getError(double[] predicted, double[] actual) {
+		return MathUtilities.meanSquaredError(predicted, actual);
 	}
+
 
 }

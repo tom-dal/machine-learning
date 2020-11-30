@@ -1,14 +1,10 @@
 package neuralnetorks;
 
-
-
-
-
-import neuralnetorks.LearningCore.ErrorFunctions;
 import neuralnetorks.builder.NetworkBuilder;
-import neuralnetorks.model.Models;
+import neuralnetorks.enums.Errors;
+import neuralnetorks.enums.Models;
 import neuralnetorks.model.Network;
-import neuralnetorks.utils.MathUtils;
+import neuralnetorks.utils.MathUtilities;
 
 public class Test {
 	
@@ -73,31 +69,30 @@ public class Test {
 		
 		NetworkBuilder builder = new NetworkBuilder(Models.LINEAR_REGRESSION);
 		
-		builder.addLayer(5).addLayer(5).addLayer(1).setInputSize(1).setNetworkName("Asghenauei").initialize();
+		builder.addLayer(5).addLayer(5).addLayer(5).addLayer(1).setInputSize(1).setNetworkName("Asghenauei");
 		
-//		Network fcn = builder.getNetwork();
-//		
-//		LearningCore lc = new LearningCore();
-//		Network clonedNetwork = lc.cloneNetwork(fcn);
-//		
-//
-//		
-//		
-//		lc.setLearningRate(0.001);
-//		lc.setErrorFunction(ErrorFunctions.MEAN_SQUARED_ERROR); 
-//		double[][] inputDataArray = new double[inputData.length][];
-//		for (int i = 0; i < inputDataArray.length; i++) {
-//			inputDataArray[i] = MathUtils.doubleToArray(inputData[i]);
-//		}
-//		
-//		
-//		lc.teach(fcn, inputDataArray, targetData,1);
-//		
-//		
-//		Network cloneNetwork = lc.cloneNetwork(fcn);
-//		System.out.println(fcn.toString());
-//		System.out.println(cloneNetwork.toString());
+		Network network = builder.getNetwork();
 		
+		LearningCore lc = new LearningCore(0.0005, Errors.MEAN_SQUARED_ERROR).configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
+		
+		
+		double[][] inputDataArray = new double[inputData.length][];
+		for (int i = 0; i < inputDataArray.length; i++) {
+			inputDataArray[i] = MathUtilities.doubleToArray(inputData[i]);
+		}
+		
+		inputDataArray = MathUtilities.normalize(inputDataArray);
+		targetData = MathUtilities.normalize(targetData);
+		
+		
+		lc.teach(network, inputDataArray, targetData, 200);
+		
+		
+		double[] test = {0.4};
+		
+		double result = lc.predict(network, test);
+		
+		System.out.println(result);
 		
 
 	}
