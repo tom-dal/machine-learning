@@ -99,4 +99,9 @@ public class MathUtilities {
 		return targetData;
 	}
 
+	public static double[] normalize(double[] input, double inputMin, double inputSpan) {
+		input[0] = (input[0] - inputMin)/inputSpan;
+		return input;
+	}
+
 }

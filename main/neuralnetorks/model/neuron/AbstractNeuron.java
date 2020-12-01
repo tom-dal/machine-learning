@@ -52,8 +52,11 @@ public abstract class AbstractNeuron {
 		this.bias = bias;
 	}
 
-	public void process() {
+	public void process(int index) {
 		double output = bias + inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum();
-		outLinks.forEach(link -> link.setValue(output));
+		outLinks.forEach(link -> {
+			link.setValue(output);
+			link.addToValueBatch(output,index);
+		});
 	}
 }

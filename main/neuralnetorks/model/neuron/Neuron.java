@@ -13,6 +13,11 @@ public class Neuron extends AbstractNeuron{
 		this.bias = nextBias;
 	}
 
+	public void process() {
+		double output = bias +  inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum();
+		outLinks.forEach(link -> link.setValue(output));
+	}
+
 
 	
 

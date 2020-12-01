@@ -1,5 +1,5 @@
 package neuralnetorks.enums;
 
-public enum Errors {
+public enum ErrorFunctions {
 	MEAN_SQUARED_ERROR
 }

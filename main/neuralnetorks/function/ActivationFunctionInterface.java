@@ -1,6 +1,6 @@
 package neuralnetorks.function;
 
-public interface ActivationFunction {
+public interface ActivationFunctionInterface {
 
 	public double processOutput(double output);
 }

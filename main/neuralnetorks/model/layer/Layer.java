@@ -52,8 +52,8 @@ public class Layer extends AbstractLayer {
 		return neurons;
 	}
 	
-	public void process() {
-		Arrays.stream(this.neurons).forEach(neuron -> neuron.process());
+	public void process(int index) {
+		Arrays.stream(this.neurons).forEach(neuron -> neuron.process(index));
 	}
 
 
@@ -64,6 +64,12 @@ public class Layer extends AbstractLayer {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+
+	public void process() {
+		Arrays.stream(this.neurons).forEach(neuron -> neuron.process());
+		
 	}
 
 }

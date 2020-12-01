@@ -1,6 +1,6 @@
 package neuralnetorks.function;
 
-public interface ErrorFunction {
+public interface ErrorFunctionInterface {
 	
 	public double getError(double[] outputBatch, double[] actual);
 

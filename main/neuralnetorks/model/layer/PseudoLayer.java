@@ -20,8 +20,12 @@ public class PseudoLayer extends AbstractLayer {
 		return pseudoNeurons;
 	}
 
+	public void process(int index) {
+		Arrays.stream(this.pseudoNeurons).forEach(neuron -> neuron.process(index));
+	}
+
 	public void process() {
-		Arrays.stream(this.pseudoNeurons).forEach(neuron -> neuron.process());
+		Arrays.stream(this.pseudoNeurons).forEach(neuron -> neuron.process());		
 	}
 
 	

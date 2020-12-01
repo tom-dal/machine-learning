@@ -10,6 +10,8 @@ public class Link {
 	private double value;
 	private double nextWeight;
 	
+	private double[] valueBatch;
+	
 
 	public AbstractNeuron getFromNeuron() {
 		return fromNeuron;
@@ -63,6 +65,21 @@ public class Link {
 	public void updateWeight() {
 		this.weight = nextWeight;
 		
+	}
+
+
+	public double[] getValueBatch() {
+		return valueBatch;
+	}
+
+
+	public void setValueBatch(double[] valueBatch) {
+		this.valueBatch = valueBatch;
+	}
+
+
+	public void addToValueBatch(double output, int index) {
+		this.valueBatch[index] = output;
 	}
 
 

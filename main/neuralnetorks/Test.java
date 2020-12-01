@@ -1,8 +1,13 @@
 package neuralnetorks;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import neuralnetorks.builder.NetworkBuilder;
-import neuralnetorks.enums.Errors;
 import neuralnetorks.enums.Models;
+import neuralnetorks.enums.NetworkOptions;
 import neuralnetorks.model.Network;
 import neuralnetorks.utils.MathUtilities;
 
@@ -31,6 +36,10 @@ public class Test {
 		                       2014, 2017, 2017, 2017, 2012, 2013, 2014, 2017, 2018, 2016, 2018,
 		                       2017, 2018, 2017, 2015, 2017, 2016, 2017, 2016, 2017, 2017, 2015,
 		                       2017, 2018, 2017, 2017, 2017, 2018, 2018, 2018};
+		
+		List<Double> inputList = new ArrayList<>();
+		
+		Arrays.stream(inputData).forEach(d -> inputList.add(d));
 		
 		double[] targetData = { 2300.,        3500.,        2500.,        2500.,        4100.,
 	              4500.,        8000.,        3510.,        5000.,        8500.,
@@ -69,11 +78,12 @@ public class Test {
 		
 		NetworkBuilder builder = new NetworkBuilder(Models.LINEAR_REGRESSION);
 		
-		builder.addLayer(5).addLayer(5).addLayer(5).addLayer(1).setInputSize(1).setNetworkName("Asghenauei");
+		builder.addLayer(5).addLayer(10).addLayer(3).addLayer(1).setInputSize(1).setNetworkName("Asghenauei");
 		
 		Network network = builder.getNetwork();
 		
-		LearningCore lc = new LearningCore(0.0005, Errors.MEAN_SQUARED_ERROR).configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
+		LearningCore lc = new LearningCore(network).configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
+		lc.setLearningRate(0.0001);
 		
 		
 		double[][] inputDataArray = new double[inputData.length][];
@@ -81,17 +91,33 @@ public class Test {
 			inputDataArray[i] = MathUtilities.doubleToArray(inputData[i]);
 		}
 		
-		inputDataArray = MathUtilities.normalize(inputDataArray);
-		targetData = MathUtilities.normalize(targetData);
+
+		lc.configuration(NetworkOptions.INPUT_BATCH_NORMALIZATION, true)
+		.configuration(NetworkOptions.TARGET_BATCH_NORMALIZATION, true);
+		
+		lc.learn(inputDataArray, targetData, 500);
+		
+//		lc.setLearningRate(0.0001);
+//		
+//		lc.learn(300);
 		
 		
-		lc.teach(network, inputDataArray, targetData, 200);
+		double[] test = new double[1];
+		
+		double result;
 		
 		
-		double[] test = {0.4};
+//		for (int i = 0; i < 161; i++) {
+//				test[0] = inputData[i];
+//				result  = lc.predict(test);
+//				double target = targetData[i];
+//				System.out.println("Input: " + test[0] + " Predicted: " + result + " Actual: " + target + " Error: "
+//						+ (target - result));
+//			
+//		}
 		
-		double result = lc.predict(network, test);
-		
+		test[0] = 1971;
+		result = lc.predict(test);
 		System.out.println(result);
 		
 
