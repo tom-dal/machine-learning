@@ -43,7 +43,6 @@ public class Test2 {
 		
 		lc.learn(inputDataArray, targetData, 30);
 		
-		
 
 		
 		
@@ -57,6 +56,7 @@ public class Test2 {
 					+ "   Error: " + ((33+23.1*test[0]) - prediction) ) ;
 			
 		}
+		
 		
 		
 		
