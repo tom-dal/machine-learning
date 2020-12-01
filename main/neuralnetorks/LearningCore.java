@@ -55,7 +55,7 @@ public class LearningCore {
 		/* DEFAULT CONFIGURATIONS */
 		this.learningRate = 0.001;
 		configuration(ErrorFunctions.MEAN_SQUARED_ERROR);
-		this.initialDiffStep = 10e-15;
+		this.initialDiffStep = 10e-10;
 	}
 
 	public void setLearningRate(double learningRate) {
@@ -103,11 +103,11 @@ public class LearningCore {
 		}
 
 		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION)) {
-			inputBatch = MathUtilities.normalize(inputCopy);
+			inputBatch = MathUtilities.normalize(inputBatch);
 			inputNormalized = true;
 		}
 		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION)) {
-			targetBatch = MathUtilities.normalize(targetCopy);
+			targetBatch = MathUtilities.normalize(targetBatch);
 			targetNormalized = true;
 		}
 
