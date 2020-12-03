@@ -16,10 +16,10 @@ import neuralnetorks.function.ErrorFunctionInterface;
 import neuralnetorks.function.MeanSquaredError;
 import neuralnetorks.model.Link;
 import neuralnetorks.model.Network;
-import neuralnetorks.model.layer.Layer;
+import neuralnetorks.model.layer.DeepLayer;
 import neuralnetorks.model.neuron.AbstractNeuron;
 import neuralnetorks.model.neuron.Neuron;
-import neuralnetorks.model.neuron.PseudoNeuron;
+import neuralnetorks.model.neuron.InputNeuron;
 import neuralnetorks.utils.MathUtilities;
 
 public class LearningCore {
@@ -37,14 +37,13 @@ public class LearningCore {
 	private double initialDiffStep;
 	private double inputMin;
 	private double inputSpan;
+	private double inputAverage;
+	private double targetAverage;
 	private double targetMin;
 	private double targetSpan;
 
 	private Map<NetworkOptions, Boolean> options;
 
-	private boolean newDataSet = true;
-	private boolean inputNormalized = false;
-	private boolean targetNormalized = false;
 
 	public LearningCore(Network network) {
 		super();
@@ -55,7 +54,7 @@ public class LearningCore {
 		/* DEFAULT CONFIGURATIONS */
 		this.learningRate = 0.001;
 		configuration(ErrorFunctions.MEAN_SQUARED_ERROR);
-		this.initialDiffStep = 10e-10;
+		this.initialDiffStep = 10e-15;
 	}
 
 	public void setLearningRate(double learningRate) {
@@ -80,41 +79,34 @@ public class LearningCore {
 	}
 
 	public void learn(double[][] inputBatch, double[] targetBatch, int iterations) {
-
+		
 		double[][] inputCopy = Arrays.copyOf(inputBatch, inputBatch.length);
 		double[] targetCopy = Arrays.copyOf(targetBatch, targetBatch.length);
 
-		if (inputCopy != this.inputBatch || targetCopy != this.targetBatch)
-			newDataSet = true;
+		this.inputBatch = inputCopy;
+		this.targetBatch = targetCopy;
 
-		if (newDataSet) {
-			this.inputBatch = inputCopy;
-			this.targetBatch = targetCopy;
-			newDataSet = false;
-
-			if (!inputNormalized)
-				this.inputMin = Arrays.stream(inputBatch).mapToDouble(i -> i[0]).min().getAsDouble();
-			if (!inputNormalized)
-				this.inputSpan = Arrays.stream(inputBatch).mapToDouble(i -> i[0]).max().getAsDouble() - inputMin;
-			if (!targetNormalized)
-				this.targetMin = Arrays.stream(targetBatch).min().getAsDouble();
-			if (!targetNormalized)
-				this.targetSpan = Arrays.stream(targetBatch).max().getAsDouble() - targetMin;
+		this.inputMin = Arrays.stream(inputBatch).mapToDouble(i -> i[0]).min().getAsDouble();
+		this.inputSpan = Arrays.stream(inputBatch).mapToDouble(i -> i[0]).max().getAsDouble() - inputMin;
+		this.targetMin = Arrays.stream(targetBatch).min().getAsDouble();
+		this.targetSpan = Arrays.stream(targetBatch).max().getAsDouble() - targetMin;
+			
+		if (options.get(NetworkOptions.INPUT_BATCH_CENTERING)) {
+			 inputBatch = MathUtilities.center(inputBatch)[0];
+			 inputAverage = MathUtilities.center(inputBatch)[1][0][0];
 		}
-
-		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION)) {
-			inputBatch = MathUtilities.normalize(inputBatch);
-			inputNormalized = true;
+		if (options.get(NetworkOptions.TARGET_BATCH_CENTERING)) {
+			targetBatch = MathUtilities.center(targetBatch)[0];
+			targetAverage = MathUtilities.center(targetBatch)[1][0];
 		}
-		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION)) {
-			targetBatch = MathUtilities.normalize(targetBatch);
-			targetNormalized = true;
-		}
-
+		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION)) inputBatch = MathUtilities.normalize(inputBatch);
+		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION)) targetBatch = MathUtilities.normalize(targetBatch);
+		
+		
 		setLinkValueBatchSize(inputBatch.length);
-
+		
+		iterationCount = 0;
 		for (int i = 0; i < iterations; i++) {
-			iterationCount++;
 			double[] outputBatch = iterateForwardPropagationOverInputBatch();
 			double err = errorFunction.getError(outputBatch, targetBatch);
 			if (err > lastErr && i != 0) {
@@ -127,9 +119,8 @@ public class LearningCore {
 			}
 			logger.debug("Iteration {}, current error: {}", i + 1, err);
 			backPropagate(outputBatch, err);
-			
 		}
-
+		iterationCount += iterations;
 	}
 
 	public void learn(int iterations) {
@@ -147,9 +138,8 @@ public class LearningCore {
 			}
 			logger.debug("Iteration {}, current error: {}", i + 1, err);
 			backPropagate(outputBatch, err);
-			
-		}
-
+		}	
+		iterationCount += iterations;
 	}
 
 	private void setLinkValueBatchSize(int length) {
@@ -160,9 +150,9 @@ public class LearningCore {
 	}
 
 	private void checkForErrors() {
-		PseudoNeuron[] inputPn = network.getInputLayer().getPseudoNeurons();
+		InputNeuron[] inputPn = network.getInputLayer().getPseudoNeurons();
 		Arrays.stream(inputPn).forEach(pn -> {
-			List<Link> links = pn.getInLinks();
+			List<AbstractLink> links = pn.getInLinks();
 			if (links.size() != 1)
 				logger.error("Input layer has more then one input per neuron");
 			if (links.get(0).getWeight() != 1)
@@ -196,10 +186,10 @@ public class LearningCore {
 			throw new InputCompilingException(msg);
 		}
 
-		PseudoNeuron[] pns = network.getInputLayer().getPseudoNeurons();
+		InputNeuron[] pns = network.getInputLayer().getPseudoNeurons();
 		for (int i = 0; i < pns.length; i++) {
 			pns[i].emptyInputLinks();
-			Link inLink = new Link();
+			AbstractLink inLink = new AbstractLink();
 			inLink.setWeight(1);
 			inLink.setValue(inputParameters[i]);
 			pns[i].getInLinks().add(inLink);
@@ -219,7 +209,7 @@ public class LearningCore {
 	}
 
 	private void backPropagate(double[] outputBatch, double err) {
-		Layer currentLayer = network.getLayers().getLast();
+		DeepLayer currentLayer = network.getLayers().getLast();
 		while (true) {
 			for (Neuron neuron : currentLayer.getNeurons()) {
 
@@ -282,7 +272,7 @@ public class LearningCore {
 
 	public double getPropagationFactor(AbstractNeuron neuron) {
 		if (neuron.getLayer().getNext() != null) {
-			Link callerLink = new Link();/* Serve solo per il debug */
+			AbstractLink callerLink = new AbstractLink();/* Serve solo per il debug */
 			double[] factors = recursivePathExplorer(neuron, 1, 0, callerLink);
 			return factors[1];
 		} else
@@ -290,13 +280,13 @@ public class LearningCore {
 	}
 
 	private double[] recursivePathExplorer(AbstractNeuron neuron, double singlePathFactor, double cumulativeFactor,
-			Link callerLink) {
+			AbstractLink callerLink) {
 		double[] factors = { singlePathFactor, cumulativeFactor };
-		for (Link link : neuron.getOutLinks()) {
+		for (AbstractLink link : neuron.getOutLinks()) {
 			logger.trace("Layer {}, Neuron {}, current single path factor: {}, cumulative factor {}",
 					neuron.getLayer().getId(), neuron.getId(), factors[0], factors[1]);
 			factors[0] *= link.getWeight();
-			logger.trace("Link {} -> {}: multypling spf for link weight {}. New Value: {}", neuron.getId(),
+			logger.trace("Link {} -> {}: multypling SPF for link weight {}. New Value: {}", neuron.getId(),
 					link.getToNeuron().getId(), link.getWeight(), factors[0]);
 
 			if (link.getToNeuron().getLayer().getNext() != null) {
@@ -319,7 +309,7 @@ public class LearningCore {
 		return factors;
 	}
 
-	private Double calculateWeightSlope(Link link, double err) {
+	private Double calculateWeightSlope(AbstractLink link, double err) {
 		if (options.get(NetworkOptions.NUMERICAL_DIFFERENTIATION)) {
 			double weightSave = link.getWeight();
 			double diffStep = initialDiffStep;
@@ -346,7 +336,7 @@ public class LearningCore {
 		}
 	}
 
-	private void updateLayerInlinks(Layer layer) {
+	private void updateLayerInlinks(DeepLayer layer) {
 		for (Neuron neuron : layer.getNeurons()) {
 			neuron.updateBias();
 			neuron.getInLinks().forEach(link -> link.updateWeight());
@@ -359,13 +349,13 @@ public class LearningCore {
 
 	public double predict(double[] input) {
 		double[] copyInput = Arrays.stream(input).map(d -> d).toArray();
-		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION))
-			copyInput = MathUtilities.normalize(copyInput, inputMin, inputSpan);
+		if (options.get(NetworkOptions.INPUT_BATCH_CENTERING)) copyInput[0] -= inputAverage;
+		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION)) copyInput = MathUtilities.normalize(copyInput, inputMin, inputSpan);
 		compileInputLinks(copyInput);
 		forwardPropagate();
 		double output = getOutput();
-		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION))
-			output = (targetMin + output * targetSpan);
+		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION)) output = (targetMin + output * targetSpan);
+		if (options.get(NetworkOptions.TARGET_BATCH_CENTERING)) output += targetAverage;
 		return output;
 	}
 

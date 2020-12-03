@@ -3,23 +3,15 @@ package neuralnetorks.model;
 import java.util.LinkedList;
 
 import neuralnetorks.enums.Models;
-import neuralnetorks.model.layer.Layer;
-import neuralnetorks.model.layer.PseudoLayer;
+import neuralnetorks.model.layer.AbstractLayer;
 
 public class Network {
 	
 	private Models model;
 	
-	private PseudoLayer inputLayer;
-	private LinkedList<Layer> layers = new LinkedList<>();
+	private LinkedList<AbstractLayer> layers = new LinkedList<>();
 	
-	public PseudoLayer getInputLayer() {
-		return inputLayer;
-	}
-	public void setInputLayer(PseudoLayer inputLayer) {
-		this.inputLayer = inputLayer;
-	}
-	public LinkedList<Layer> getLayers() {
+	public LinkedList<AbstractLayer> getLayers() {
 		return layers;
 	}
 	public Models getModel() {

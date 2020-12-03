@@ -1,16 +1,16 @@
-package neuralnetorks.model;
+package neuralnetorks.model.link;
 
 import neuralnetorks.model.neuron.AbstractNeuron;
 
-public class Link {
+public abstract class AbstractLink {
 	
-	private AbstractNeuron fromNeuron;
-	private AbstractNeuron toNeuron;
-	private double weight;
-	private double value;
-	private double nextWeight;
+	protected AbstractNeuron fromNeuron;
+	protected AbstractNeuron toNeuron;
+	protected double weight;
+	protected double value;
+	protected double nextWeight;
 	
-	private double[] valueBatch;
+	protected double[] valueBatch; /* Un record dei valori assunti per ogni batch in input durante il training*/
 	
 
 	public AbstractNeuron getFromNeuron() {
@@ -38,9 +38,7 @@ public class Link {
 	}
 
 
-	public void setWeight(double weight) {
-		this.weight = weight;
-	}
+	public abstract void setWeight(double weight);
 
 
 	public double getValue() {

@@ -13,7 +13,7 @@ public class Test3 {
 				
 		NetworkBuilder builder = new NetworkBuilder(Models.LINEAR_REGRESSION);
 		
-		builder.addLayer(5).addLayer(5).addLayer(1).setInputSize(1).setNetworkName("Asghenauei");
+		builder.addDeepLayer(5).addDeepLayer(5).addDeepLayer(1).setInputSize(1).setNetworkName("Asghenauei");
 		
 		Network network = builder.getNetwork();
 		

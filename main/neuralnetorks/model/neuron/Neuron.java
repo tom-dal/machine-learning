@@ -1,9 +1,18 @@
 package neuralnetorks.model.neuron;
 
+import java.util.Set;
+
+import neuralnetorks.model.link.AbstractLink;
+import neuralnetorks.utils.MathUtilities;
+
 public class Neuron extends AbstractNeuron{
 
 	private double nextBias;
 	
+	public Neuron() {
+		super();
+		this.bias = MathUtilities.getRandomDouble();
+	}
 		
 	public void setNextBias(double nextBias) {
 		this.nextBias = nextBias;
@@ -13,12 +22,19 @@ public class Neuron extends AbstractNeuron{
 		this.bias = nextBias;
 	}
 
-	public void process() {
-		double output = bias +  inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum();
-		outLinks.forEach(link -> link.setValue(output));
+	@Override
+	public void setBias(double bias) {
+		this.bias = bias;
+	}
+	
+	@Override
+	public Set<AbstractLink> getInLinks() {
+		return inLinks;
 	}
 
-
-	
+	@Override
+	public Set<AbstractLink> getOutLinks() {
+		return outLinks;
+	}	
 
 }

@@ -1,56 +1,49 @@
 package neuralnetorks.model.neuron;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-import neuralnetorks.model.Link;
-import neuralnetorks.model.layer.Layer;
-import neuralnetorks.utils.IdUtil;
-import neuralnetorks.utils.MathUtilities;
+import neuralnetorks.model.layer.AbstractLayer;
+import neuralnetorks.model.link.AbstractLink;
 
 public abstract class AbstractNeuron {
 
-	private final Long id;
+	private  String id;
 
-	protected List<Link> inLinks = new ArrayList<>();
-	protected List<Link> outLinks = new ArrayList<>();
+	protected Set<AbstractLink> inLinks;
+	protected Set<AbstractLink> outLinks;
 	
-	protected Layer layer;
+	protected double bias;
+	
+	protected AbstractLayer layer;
+	
+	protected AbstractNeuron() {
+		this.inLinks = new HashSet<>();
+		this.outLinks = new HashSet<>();
+	}
 
-	public Layer getLayer() {
+	public AbstractLayer getLayer() {
 		return layer;
 	}
 
-	public void setLayer(Layer layer) {
+	public void setLayer(AbstractLayer layer) {
 		this.layer = layer;
 	}
-
-	protected double bias;
-
-	public AbstractNeuron() {
-		this.id = IdUtil.getNewId();
-		this.bias = MathUtilities.getRandomDouble();
-	}
-
-	public List<Link> getInLinks() {
-		return inLinks;
-	}
-
-	public List<Link> getOutLinks() {
-		return outLinks;
-	}
-
-	public Long getId() {
+	
+	public String getId() {
 		return id;
 	}
+	
+	public void setId(final String id) {
+		this.id = id;
+	}
 
-	public double getBias() {
+
+	public  double getBias() {
 		return bias;
 	}
 
-	public void setBias(double bias) {
-		this.bias = bias;
-	}
+	public abstract void setBias(double bias);
 
 	public void process(int index) {
 		double output = bias + inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum();
@@ -59,4 +52,13 @@ public abstract class AbstractNeuron {
 			link.addToValueBatch(output,index);
 		});
 	}
+	
+	public void process() {
+		double output = bias + inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum();
+		outLinks.forEach(link -> link.setValue(output));
+	}
+
+	public abstract Set<AbstractLink> getInLinks();
+
+	public abstract Set<AbstractLink> getOutLinks();
 }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import neuralnetorks.builder.NetworkBuilder;
+import neuralnetorks.enums.ErrorFunctions;
 import neuralnetorks.enums.Models;
 import neuralnetorks.enums.NetworkOptions;
 import neuralnetorks.model.Network;
@@ -78,28 +79,34 @@ public class Test {
 		
 		NetworkBuilder builder = new NetworkBuilder(Models.LINEAR_REGRESSION);
 		
-		builder.addLayer(5).addLayer(10).addLayer(3).addLayer(1).setInputSize(1).setNetworkName("Asghenauei");
+		builder.addDeepLayer(5).addDeepLayer(10).addDeepLayer(1).setInputSize(1).setNetworkName("Asghenauei");
 		
 		Network network = builder.getNetwork();
 		
 		LearningCore lc = new LearningCore(network).configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
-		lc.setLearningRate(0.0001);
+		lc.setLearningRate(0.001);
 		
 		
 		double[][] inputDataArray = new double[inputData.length][];
 		for (int i = 0; i < inputDataArray.length; i++) {
-			inputDataArray[i] = MathUtilities.doubleToArray(inputData[i]);
+			inputDataArray[i] = MathUtilities.doubleToArray(Math.log(inputData[i]));
 		}
 		
 
+		lc.configuration(NetworkOptions.INPUT_BATCH_CENTERING, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_NORMALIZATION, true)
-		.configuration(NetworkOptions.TARGET_BATCH_NORMALIZATION, true);
+//		.configuration(NetworkOptions.TARGET_BATCH_NORMALIZATION, true)
+		.configuration(ErrorFunctions.ABSOLUTE_ERROR);
 		
-		lc.learn(inputDataArray, targetData, 500);
+		lc.learn(inputDataArray, targetData, 20);
 		
 //		lc.setLearningRate(0.0001);
 //		
-//		lc.learn(300);
+//		lc.learn(100);
+//		
+//		lc.setLearningRate(0.00001);
+//		
+//		lc.learn(100);
 		
 		
 		double[] test = new double[1];
@@ -107,18 +114,18 @@ public class Test {
 		double result;
 		
 		
-//		for (int i = 0; i < 161; i++) {
-//				test[0] = inputData[i];
-//				result  = lc.predict(test);
-//				double target = targetData[i];
-//				System.out.println("Input: " + test[0] + " Predicted: " + result + " Actual: " + target + " Error: "
-//						+ (target - result));
-//			
-//		}
+		for (int i = 0; i < 161; i++) {
+				test[0] = inputData[i];
+				result  = lc.predict(test);
+				double target = targetData[i];
+				System.out.println("Input: " + test[0] + " Predicted: " + Math.exp(result) + " Actual: " + target + " Error: "
+						+ (target - result));
+			
+		}
 		
-		test[0] = 1971;
-		result = lc.predict(test);
-		System.out.println(result);
+//		test[0] = 1971;
+//		result = lc.predict(test);
+//		System.out.println(result);
 		
 
 	}

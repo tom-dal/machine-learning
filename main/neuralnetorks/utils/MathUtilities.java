@@ -3,7 +3,6 @@ package neuralnetorks.utils;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.apache.commons.math3.random.GaussianRandomGenerator;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.apache.commons.math3.random.RandomGeneratorFactory;
 
@@ -29,6 +28,7 @@ public class MathUtilities {
 		mse/=actual.length;
 		return mse;
 	}
+
 	
 	public static double square(double num) {
 		return num*num;
@@ -83,7 +83,6 @@ public class MathUtilities {
 		for (int j = 0; j < inputDataArray.length; j++) {
 			double[] normValue = {(inputDataArray[j][0] - min)/span};
 			inputDataArray[j] = normValue;
-			
 		}
 		return inputDataArray;
 	}
@@ -93,8 +92,7 @@ public class MathUtilities {
 		double span = Arrays.stream(targetData).max().getAsDouble() - min;
 		for (int j = 0; j < targetData.length; j++) {
 			double normValue = (targetData[j] - min)/span;
-			targetData[j] = normValue;
-			
+			targetData[j] = normValue;	
 		}
 		return targetData;
 	}
@@ -103,5 +101,27 @@ public class MathUtilities {
 		input[0] = (input[0] - inputMin)/inputSpan;
 		return input;
 	}
+
+	public static double absoluteError(double[] predicted, double[] actual) {
+		double mae = 0;
+		for (int i = 0; i < actual.length; i++) {
+			mae += Math.abs(predicted[i] - actual[i]);
+		}
+		mae/=actual.length;
+		return mae;
+	}
+
+	public static double[][][] center(double[][] batch) {
+		double avg = Arrays.stream(batch).mapToDouble(d -> d[0]).sum()/batch.length;
+		Arrays.stream(batch).forEach(d -> d[0]-=avg);
+		return new double[][][] {   batch      ,     new double[][]{new double[]{avg} }};
+	}
+
+	public static double[][] center(double[] batch) {
+		double avg = Arrays.stream(batch).sum()/batch.length;
+		Arrays.stream(batch).forEach(d -> d-=avg);
+		return new double[][] {batch,  new double[] {avg}};
+	}
+	
 
 }
