@@ -14,6 +14,7 @@ public abstract class AbstractNeuron {
 	protected Set<AbstractLink> outLinks;
 	
 	protected double bias;
+	protected double nextBias;
 	
 	protected AbstractLayer layer;
 	
@@ -44,6 +45,13 @@ public abstract class AbstractNeuron {
 	}
 
 	public abstract void setBias(double bias);
+	
+	public abstract void setNextBias(double bias);
+	
+	public void updateBias() {
+		this.bias = nextBias;
+	}
+
 
 	public void process(int index) {
 		double output = bias + inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum();

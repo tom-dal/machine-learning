@@ -33,7 +33,13 @@ public class InputNeuron  extends AbstractNeuron {
 
 	@Override
 	public Set<AbstractLink> getInLinks() {
-		System.out.println("!!!!!!!!! getInlinks() invocato da un'istanza di InputNeuron !!!!!!!!!!");
-		return null;
+		return null; /*Deve ritornare null in modo che il neurone non venga considerato
+		quando questo metodo è invocato da UpdateLayerInLinks*/
+	}
+
+
+	@Override
+	public void setNextBias(double nextBias) {
+		this.nextBias = 0; /*Fail-safe*/
 	}
 }

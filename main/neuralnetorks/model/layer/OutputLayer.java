@@ -2,6 +2,8 @@ package neuralnetorks.model.layer;
 
 
 
+import java.util.Set;
+
 import neuralnetorks.model.neuron.OutputNeuron;
 
 public class OutputLayer extends AbstractLayer {
@@ -18,7 +20,6 @@ public class OutputLayer extends AbstractLayer {
 			n.setId(neuronCount + "-OUT");
 		});	
 	}
-
 
 
 	

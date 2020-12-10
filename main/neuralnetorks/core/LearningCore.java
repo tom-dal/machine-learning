@@ -1,8 +1,9 @@
-package neuralnetorks;
+package neuralnetorks.core;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -14,11 +15,16 @@ import neuralnetorks.enums.NetworkOptions;
 import neuralnetorks.exception.InputCompilingException;
 import neuralnetorks.function.ErrorFunctionInterface;
 import neuralnetorks.function.MeanSquaredError;
-import neuralnetorks.model.Link;
 import neuralnetorks.model.Network;
+import neuralnetorks.model.layer.AbstractLayer;
 import neuralnetorks.model.layer.DeepLayer;
+import neuralnetorks.model.layer.InputLayer;
+import neuralnetorks.model.layer.OutputLayer;
+import neuralnetorks.model.link.AbstractLink;
+import neuralnetorks.model.link.Link;
 import neuralnetorks.model.neuron.AbstractNeuron;
 import neuralnetorks.model.neuron.Neuron;
+import neuralnetorks.model.neuron.OutputNeuron;
 import neuralnetorks.model.neuron.InputNeuron;
 import neuralnetorks.utils.MathUtilities;
 
@@ -28,22 +34,26 @@ public class LearningCore {
 
 	private Network network;
 	private double[][] inputBatch;
-	private double[] targetBatch;
+	private double[][] targetBatch;
 	private double lastErr = 0;
 	private int iterationCount;
 
 	private double learningRate;
 	private ErrorFunctionInterface errorFunction;
 	private double initialDiffStep;
-	private double inputMin;
-	private double inputSpan;
-	private double inputAverage;
-	private double targetAverage;
-	private double targetMin;
-	private double targetSpan;
+	private int inputBatchLength;
+	private double[] inputMin;
+	private double[] inputSpan;
+	private double[] inputAverage;
+	private double[] targetAverage;
+	private double[] targetMin;
+	private double[] targetSpan;
+	private boolean inputNormalized = false;
+	private boolean targetNormalized = false;
+
+	static int index = 0;
 
 	private Map<NetworkOptions, Boolean> options;
-
 
 	public LearningCore(Network network) {
 		super();
@@ -78,37 +88,55 @@ public class LearningCore {
 		}
 	}
 
-	public void learn(double[][] inputBatch, double[] targetBatch, int iterations) {
+	public void learn(double[][] inputData, double[][] targetData, int iterations) {
+
+		this.inputBatch = MathUtilities.copy2dArray(inputData);
+		this.targetBatch = MathUtilities.copy2dArray(targetData);
+
+		inputBatchLength = inputData.length;
+		int inputFeatures = inputData[0].length;
+		int outputFeatures = targetData[0].length;
+
+		this.inputMin = new double[inputFeatures];
+		this.inputSpan = new double[inputFeatures];
+		this.targetMin = new double[outputFeatures];
+		this.targetSpan = new double[outputFeatures];
+
+		for (int i = 0; i < inputFeatures; i++) {
+			index=i;
+			inputMin[index] = Arrays.stream(inputBatch).mapToDouble(array -> array[index]).min().getAsDouble();
+			inputSpan[index] = Arrays.stream(inputBatch).mapToDouble(array -> array[index]).max().getAsDouble() - inputMin[index];
+		}
 		
-		double[][] inputCopy = Arrays.copyOf(inputBatch, inputBatch.length);
-		double[] targetCopy = Arrays.copyOf(targetBatch, targetBatch.length);
+		for (int i = 0; i < outputFeatures; i++) {
+			index=i;
+			targetMin[index] = Arrays.stream(targetBatch).mapToDouble(array -> array[index]).min().getAsDouble();
+			targetSpan[index] = Arrays.stream(targetBatch).mapToDouble(array -> array[index]).max().getAsDouble() - targetMin[index];
+		}
 
-		this.inputBatch = inputCopy;
-		this.targetBatch = targetCopy;
-
-		this.inputMin = Arrays.stream(inputBatch).mapToDouble(i -> i[0]).min().getAsDouble();
-		this.inputSpan = Arrays.stream(inputBatch).mapToDouble(i -> i[0]).max().getAsDouble() - inputMin;
-		this.targetMin = Arrays.stream(targetBatch).min().getAsDouble();
-		this.targetSpan = Arrays.stream(targetBatch).max().getAsDouble() - targetMin;
-			
 		if (options.get(NetworkOptions.INPUT_BATCH_CENTERING)) {
-			 inputBatch = MathUtilities.center(inputBatch)[0];
-			 inputAverage = MathUtilities.center(inputBatch)[1][0][0];
+			inputAverage = MathUtilities.average(inputBatch);
+			MathUtilities.center(inputBatch, inputAverage); /* da testare */
 		}
 		if (options.get(NetworkOptions.TARGET_BATCH_CENTERING)) {
-			targetBatch = MathUtilities.center(targetBatch)[0];
-			targetAverage = MathUtilities.center(targetBatch)[1][0];
+			targetAverage = MathUtilities.average(targetBatch);
+			MathUtilities.center(targetBatch, targetAverage);
 		}
-		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION)) inputBatch = MathUtilities.normalize(inputBatch);
-		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION)) targetBatch = MathUtilities.normalize(targetBatch);
-		
-		
-		setLinkValueBatchSize(inputBatch.length);
-		
+		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION)) {
+			MathUtilities.normalizeBatch(inputBatch, inputSpan, inputMin);
+			inputNormalized = true;
+		}
+		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION)) {
+			MathUtilities.normalizeBatch(targetBatch, targetSpan, targetMin);
+			targetNormalized = true;
+		}
+
+		setLinkValueBatchSize(inputBatchLength);
+
 		iterationCount = 0;
 		for (int i = 0; i < iterations; i++) {
-			double[] outputBatch = iterateForwardPropagationOverInputBatch();
-			double err = errorFunction.getError(outputBatch, targetBatch);
+			double[][] outputBatch = iterateForwardPropagationOverInputBatch();
+			double err = errorFunction.getError(outputBatch, targetData);
 			if (err > lastErr && i != 0) {
 				logger.warn("Error has increased in last iteration {}.", i + 1);
 				initialDiffStep *= 10;
@@ -118,7 +146,7 @@ public class LearningCore {
 				checkForErrors();
 			}
 			logger.debug("Iteration {}, current error: {}", i + 1, err);
-			backPropagate(outputBatch, err);
+			backPropagate(err);
 		}
 		iterationCount += iterations;
 	}
@@ -126,7 +154,7 @@ public class LearningCore {
 	public void learn(int iterations) {
 
 		for (int i = iterationCount; i < iterationCount + iterations; i++) {
-			double[] outputBatch = iterateForwardPropagationOverInputBatch();
+			double[][] outputBatch = iterateForwardPropagationOverInputBatch();
 			double err = errorFunction.getError(outputBatch, targetBatch);
 			if (err > lastErr && i != 0) {
 				logger.warn("Error has increased in last iteration {}.", i + 1);
@@ -137,41 +165,28 @@ public class LearningCore {
 				checkForErrors();
 			}
 			logger.debug("Iteration {}, current error: {}", i + 1, err);
-			backPropagate(outputBatch, err);
-		}	
+			backPropagate(err);
+		}
 		iterationCount += iterations;
 	}
 
 	private void setLinkValueBatchSize(int length) {
-		Arrays.stream(network.getInputLayer().getPseudoNeurons())
-				.forEach(neuron -> neuron.getOutLinks().forEach(link -> link.setValueBatch(new double[length])));
-		network.getLayers().forEach(layer -> Arrays.stream(layer.getNeurons())
+		network.getLayers().stream().filter(layer -> !layer.getClass().equals(OutputLayer.class))
+		.forEach(layer -> layer.getNeurons()
 				.forEach(neuron -> neuron.getOutLinks().forEach(link -> link.setValueBatch(new double[length]))));
+		network.getOutputLayer().getNeurons().forEach(neuron -> ((OutputNeuron) neuron).getOutLink().setValueBatch(new double[length]));
 	}
 
 	private void checkForErrors() {
-		InputNeuron[] inputPn = network.getInputLayer().getPseudoNeurons();
-		Arrays.stream(inputPn).forEach(pn -> {
-			List<AbstractLink> links = pn.getInLinks();
-			if (links.size() != 1)
-				logger.error("Input layer has more then one input per neuron");
-			if (links.get(0).getWeight() != 1)
-				logger.error("Input link's weight different from 1 in input layer.");
-		});
-		Neuron[] outputNeurons = network.getLayers().getLast().getNeurons();
-		if (outputNeurons.length != 1 && network.getModel().equals(Models.LINEAR_REGRESSION)) {
+		Set<AbstractNeuron> outputNeurons = network.getLayers().getLast().getNeurons();
+		if (outputNeurons.size() != 1 && network.getModel().equals(Models.LINEAR_REGRESSION)) {
 			logger.error("Output layer can have only one neuron in linear regression model.");
-		}
-		if (outputNeurons[0].getOutLinks().size() != 1)
-			logger.error("Output layer must have one output link.");
-		if (outputNeurons[0].getOutLinks().get(0).getWeight() != 1) {
-			logger.error("Output link's weight different from 1 in output layer.");
 		}
 	}
 
-	private double[] iterateForwardPropagationOverInputBatch() {
-		double[] outputBatch = new double[inputBatch.length];
-		for (int j = 0; j < inputBatch.length; j++) {
+	private double[][] iterateForwardPropagationOverInputBatch() {
+		double[][] outputBatch = new double[inputBatchLength][];
+		for (int j = 0; j < inputBatchLength; j++) {
 			compileInputLinks(inputBatch[j]);
 			forwardPropagate(j);
 			outputBatch[j] = getOutput();
@@ -179,21 +194,19 @@ public class LearningCore {
 		return outputBatch;
 	}
 
-	private void compileInputLinks(double[] inputParameters) {
-		if (inputParameters.length != network.getInputLayer().getPseudoNeurons().length) {
-			String msg = "Number of input parameters must equal input layer size.";
-			logger.error(msg);
-			throw new InputCompilingException(msg);
+	private void compileInputLinks(double[] inputValues) throws InputCompilingException {
+
+		Set<AbstractNeuron> inputNeurons = network.getInputLayer().getNeurons();
+		if (inputValues.length != inputNeurons.size()) {
+			throw new InputCompilingException("Number of input parameters must equal neurons number in input layer.");
 		}
 
-		InputNeuron[] pns = network.getInputLayer().getPseudoNeurons();
-		for (int i = 0; i < pns.length; i++) {
-			pns[i].emptyInputLinks();
-			AbstractLink inLink = new AbstractLink();
-			inLink.setWeight(1);
-			inLink.setValue(inputParameters[i]);
-			pns[i].getInLinks().add(inLink);
-		}
+		index = 0;
+		inputNeurons.forEach(neuron -> {
+			InputNeuron inputNeuron = (InputNeuron) neuron;
+			inputNeuron.getInLink().setValue(inputValues[index]);
+			index++;
+		});
 	}
 
 	private void forwardPropagate(int batchIndex) {
@@ -208,29 +221,27 @@ public class LearningCore {
 
 	}
 
-	private void backPropagate(double[] outputBatch, double err) {
-		DeepLayer currentLayer = network.getLayers().getLast();
-		while (true) {
-			for (Neuron neuron : currentLayer.getNeurons()) {
+	private void backPropagate(double err) {
+		AbstractLayer currentLayer = network.getLayers().getLast();
+		while (currentLayer.getPrevious() != null) {
+			currentLayer.getNeurons().forEach(neuron -> {
 
 				neuron.getInLinks().forEach(inLink -> {
 					double slope = calculateWeightSlope(inLink, err);
-					logger.debug("Calculated error/weight slope for link  {}->{}: {})", inLink.getFromNeuron().getId(),
+					logger.debug("Calculated error/weight slope for link  {} --> {}:  {})", inLink.getFromNeuron().getId(),
 							inLink.getToNeuron().getId(), slope);
 					inLink.setNextWeight(inLink.getWeight() - slope * learningRate);
 				});
 
 				double slope = calculateBiasSlope(neuron, err);
-				logger.debug("Calculated error/bias slope for neuron {}: {})", neuron.getId(), slope);
+				logger.debug("Calculated error/bias slope for neuron {}:  {})", neuron.getId(), slope);
 				neuron.setNextBias(neuron.getBias() - slope * learningRate);
-			}
+			});
 
-			if (currentLayer.getPrevious() != null) {
-				currentLayer = currentLayer.getPrevious();
-			} else {
-				break;
-			}
+			currentLayer = currentLayer.getPrevious();
 		}
+		
+		/*UPDATE WEIGHTS*/
 		currentLayer = network.getLayers().getLast();
 		while (true) {
 			updateLayerInlinks(currentLayer);
@@ -250,7 +261,7 @@ public class LearningCore {
 			double newErr;
 			while (true) {
 				neuron.setBias(biasSave + diffStep);
-				double[] newOutputBatch = iterateForwardPropagationOverInputBatch();
+				double[][] newOutputBatch = iterateForwardPropagationOverInputBatch();
 				newErr = errorFunction.getError(newOutputBatch, targetBatch);
 				if (newErr == err) {
 					diffStep *= 10;
@@ -261,10 +272,10 @@ public class LearningCore {
 			double slope = (newErr - err) / diffStep;
 			return slope;
 		} else {
-			double slope = Math.sqrt(err * inputBatch.length) / inputBatch.length;
+			double slope = Math.sqrt(err * inputBatchLength) / inputBatchLength;
 			double propagationFactor = getPropagationFactor(neuron);
 			slope *= propagationFactor;
-			slope *= inputBatch.length;
+			slope *= inputBatchLength;
 			logger.debug("Neuron {} propagation factor: {}", neuron.getId(), propagationFactor);
 			return slope;
 		}
@@ -272,7 +283,7 @@ public class LearningCore {
 
 	public double getPropagationFactor(AbstractNeuron neuron) {
 		if (neuron.getLayer().getNext() != null) {
-			AbstractLink callerLink = new AbstractLink();/* Serve solo per il debug */
+			AbstractLink callerLink = new Link();/* Serve solo per il debug */
 			double[] factors = recursivePathExplorer(neuron, 1, 0, callerLink);
 			return factors[1];
 		} else
@@ -316,7 +327,7 @@ public class LearningCore {
 			double newErr;
 			while (true) {
 				link.setWeight(weightSave + diffStep);
-				double[] newOutputBatch = iterateForwardPropagationOverInputBatch();
+				double[][] newOutputBatch = iterateForwardPropagationOverInputBatch();
 				newErr = errorFunction.getError(newOutputBatch, targetBatch);
 				if (newErr == err) {
 					diffStep *= 10;
@@ -328,7 +339,7 @@ public class LearningCore {
 			link.setWeight(weightSave);
 			return slope;
 		} else {
-			double slope = Math.sqrt(err * inputBatch.length) / inputBatch.length;
+			double slope = Math.sqrt(err * inputBatchLength) / inputBatchLength;
 			double propagationFactor = getPropagationFactor(link.getToNeuron());
 			slope *= propagationFactor;
 			slope *= Arrays.stream(link.getValueBatch()).sum();
@@ -336,26 +347,34 @@ public class LearningCore {
 		}
 	}
 
-	private void updateLayerInlinks(DeepLayer layer) {
-		for (Neuron neuron : layer.getNeurons()) {
-			neuron.updateBias();
-			neuron.getInLinks().forEach(link -> link.updateWeight());
+	private void updateLayerInlinks(AbstractLayer layer) {
+		layer.getNeurons().forEach(neuron -> {
+			if (neuron.getInLinks() != null) { /* InputNeuron ritorna null e non ho bisogno di aggiornarlo */
+				neuron.updateBias();
+				neuron.getInLinks().forEach(link -> link.updateWeight());
+			}
+		});
+	}
+
+	private double[] getOutput() {
+		return network.getLayers().getLast().getNeurons().stream()
+				.mapToDouble(neuron -> ((OutputNeuron) neuron).getOutLink().getValue()).toArray();
+	}
+
+	public double[] predict(double[] input) {
+		double[] copyInput = Arrays.copyOf(input, input.length);
+		if (options.get(NetworkOptions.INPUT_BATCH_CENTERING)) {
+			MathUtilities.centerSingleInput(copyInput, inputAverage);
 		}
-	}
-
-	private double getOutput() {
-		return network.getLayers().getLast().getNeurons()[0].getOutLinks().get(0).getValue();
-	}
-
-	public double predict(double[] input) {
-		double[] copyInput = Arrays.stream(input).map(d -> d).toArray();
-		if (options.get(NetworkOptions.INPUT_BATCH_CENTERING)) copyInput[0] -= inputAverage;
-		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION)) copyInput = MathUtilities.normalize(copyInput, inputMin, inputSpan);
+		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION))
+			 MathUtilities.normalizeSingleInput(copyInput, inputMin, inputSpan);
 		compileInputLinks(copyInput);
 		forwardPropagate();
-		double output = getOutput();
-		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION)) output = (targetMin + output * targetSpan);
-		if (options.get(NetworkOptions.TARGET_BATCH_CENTERING)) output += targetAverage;
+		double[] output = getOutput();
+		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION))
+			MathUtilities.revertNormalization(output, inputMin, inputSpan );
+		if (options.get(NetworkOptions.TARGET_BATCH_CENTERING))
+			MathUtilities.revertCentering(output, inputAverage);
 		return output;
 	}
 

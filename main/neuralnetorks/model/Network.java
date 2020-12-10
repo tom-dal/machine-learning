@@ -4,6 +4,8 @@ import java.util.LinkedList;
 
 import neuralnetorks.enums.Models;
 import neuralnetorks.model.layer.AbstractLayer;
+import neuralnetorks.model.layer.InputLayer;
+import neuralnetorks.model.layer.OutputLayer;
 
 public class Network {
 	
@@ -21,7 +23,13 @@ public class Network {
 		this.model = model;
 	}
 	
+	public InputLayer getInputLayer() {
+		return (InputLayer) layers.getFirst();
+	}
 	
+	public OutputLayer getOutputLayer() {
+		return (OutputLayer) layers.getLast();
+	}
 	
 
 }

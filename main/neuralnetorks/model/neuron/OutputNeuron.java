@@ -32,7 +32,12 @@ public class OutputNeuron  extends AbstractNeuron {
 
 	@Override
 	public Set<AbstractLink> getOutLinks() {
-		System.out.println("!!!!!!!!! getOutLinks() invocato da un'istanza di InputNeuron !!!!!!!!!!");
+		System.out.println("!!!!!!!!! getOutLinks() invocato da un'istanza di OutputNeuron !!!!!!!!!!");
 		return null;
+	}
+
+	@Override
+	public void setNextBias(double nextBias) {
+		this.nextBias=bias;
 	}
 }

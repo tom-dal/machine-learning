@@ -6,8 +6,6 @@ import neuralnetorks.model.link.AbstractLink;
 import neuralnetorks.utils.MathUtilities;
 
 public class Neuron extends AbstractNeuron{
-
-	private double nextBias;
 	
 	public Neuron() {
 		super();
@@ -18,15 +16,10 @@ public class Neuron extends AbstractNeuron{
 		this.nextBias = nextBias;
 	}
 	
-	public void updateBias() {
-		this.bias = nextBias;
-	}
-
-	@Override
 	public void setBias(double bias) {
 		this.bias = bias;
 	}
-	
+		
 	@Override
 	public Set<AbstractLink> getInLinks() {
 		return inLinks;

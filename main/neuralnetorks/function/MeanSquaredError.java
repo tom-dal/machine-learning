@@ -5,8 +5,8 @@ import neuralnetorks.utils.MathUtilities;
 public class MeanSquaredError implements ErrorFunctionInterface {
 
 	@Override
-	public double getError(double[] predicted, double[] actual) {
-		return MathUtilities.meanSquaredError(predicted, actual);
+	public double getError(double[][] outputBatch, double[][] targetData) {
+		return MathUtilities.meanSquaredError(outputBatch, targetData);
 	}
 
 

@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import neuralnetorks.enums.Models;
 import neuralnetorks.model.Network;
 import neuralnetorks.model.layer.DeepLayer;
+import neuralnetorks.model.layer.InputLayer;
+import neuralnetorks.model.layer.OutputLayer;
 import neuralnetorks.model.link.Link;
 import neuralnetorks.model.neuron.AbstractNeuron;
 import neuralnetorks.utils.MathUtilities;
@@ -48,6 +50,8 @@ public class NetworkBuilder {
 			logger.error("Cannot initialize network{}: output layer must have one neuron in linear regression model.",
 					networkName != null ? " " + networkName : "");
 		}
+		
+		convertLastLayerToOutput();
 
 		/* Link layers */
 		this.network.getLayers().forEach(layer -> {
@@ -63,7 +67,7 @@ public class NetworkBuilder {
 		for (int i = 1; i < network.getLayers().size()-1; i++) {
 			logger.info("Deep layer {} has {} neurons.", i , network.getLayers().get(i).getNeurons().size());
 			for (AbstractNeuron neuron : network.getLayers().get(i).getNeurons()) {
-				logger.debug("NeuronId: {}", neuron.getId());
+				logger.trace("NeuronId: {}", neuron.getId());
 			}
 		}
 		logger.info("Number of connections: {}", linksNumber);
@@ -71,6 +75,15 @@ public class NetworkBuilder {
 		return this;
 	}
 
+
+	private void convertLastLayerToOutput() {
+		int neuronsNumber = network.getLayers().getLast().getNeurons().size();
+		network.getLayers().removeLast();
+		OutputLayer outputLayer = new OutputLayer(neuronsNumber);
+		outputLayer.setPrevious(network.getLayers().getLast());
+		network.getLayers().getLast().setNext(outputLayer);
+		network.getLayers().add(outputLayer);
+	}
 
 	private void linkNeurons(AbstractNeuron fromNeuron, AbstractNeuron toNeuron) {
 		Link link = new Link();
@@ -83,17 +96,24 @@ public class NetworkBuilder {
 		linksNumber++;
 	}
 
-	public NetworkBuilder addDeepLayer(int numberOfNeurons) {
-		DeepLayer newLayer = new DeepLayer(numberOfNeurons);
-		neuronCount += numberOfNeurons;
-		if (newLayerIndex != 0) {
+	public NetworkBuilder addLayer(int numberOfNeurons) {
+		if (!network.getLayers().isEmpty() && newLayerIndex != 0) /*E' un double check*/ { 
+			DeepLayer newLayer = new DeepLayer(numberOfNeurons);
+			neuronCount += numberOfNeurons;
 			newLayer.setPrevious(network.getLayers().getLast());
 			network.getLayers().getLast().setNext(newLayer);
+			this.network.getLayers().add(newLayer);
+			newLayerIndex++;
+			logger.trace("Added layer {} with {} neurons", network.getLayers().indexOf(newLayer) + 1, numberOfNeurons);
+			return this;
+		} else {
+			InputLayer inputLayer = new InputLayer(numberOfNeurons);
+			neuronCount += numberOfNeurons;
+			this.network.getLayers().add(inputLayer);
+			newLayerIndex++;
+			logger.trace("Added input layer with {} neurons", numberOfNeurons);
+			return this;
 		}
-		this.network.getLayers().add(newLayer);
-		logger.trace("Added layer {} with {} neurons", network.getLayers().indexOf(newLayer) + 1, numberOfNeurons);
-		newLayerIndex++;
-		return this;
 	}
 
 	public NetworkBuilder setNetworkName(String networkName) {

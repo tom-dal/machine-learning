@@ -2,6 +2,8 @@ package neuralnetorks.model.layer;
 
 
 
+import java.util.Set;
+
 import neuralnetorks.model.neuron.InputNeuron;
 
 

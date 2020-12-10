@@ -2,7 +2,7 @@ package neuralnetorks.function;
 
 public interface ErrorFunctionInterface {
 	
-	public double getError(double[] outputBatch, double[] actual);
+	public double getError(double[][] outputBatch, double[][] targetData);
 
 
 }
