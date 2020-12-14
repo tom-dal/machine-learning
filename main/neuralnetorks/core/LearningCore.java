@@ -13,8 +13,8 @@ import neuralnetorks.enums.ErrorFunctions;
 import neuralnetorks.enums.Models;
 import neuralnetorks.enums.NetworkOptions;
 import neuralnetorks.exception.InputCompilingException;
-import neuralnetorks.function.ErrorFunctionInterface;
-import neuralnetorks.function.MeanSquaredError;
+import neuralnetorks.function.error.MeanSquaredError;
+import neuralnetorks.function.interfaces.ErrorFunctionInterface;
 import neuralnetorks.model.Network;
 import neuralnetorks.model.layer.AbstractLayer;
 import neuralnetorks.model.layer.DeepLayer;
@@ -82,6 +82,9 @@ public class LearningCore {
 
 	public void configuration(ErrorFunctions errorFunction) {
 		if (errorFunction.equals(ErrorFunctions.MEAN_SQUARED_ERROR)) {
+			this.errorFunction = new MeanSquaredError();
+		}
+		else if (errorFunction.equals(ErrorFunctions.ABSOLUTE_ERROR)) {
 			this.errorFunction = new MeanSquaredError();
 		}
 	}

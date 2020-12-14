@@ -2,6 +2,7 @@ package neuralnetorks.model.neuron;
 
 import java.util.Set;
 
+import neuralnetorks.enums.ActivationFunctions;
 import neuralnetorks.model.link.AbstractLink;
 import neuralnetorks.model.link.InputLink;
 
@@ -11,7 +12,7 @@ public class InputNeuron  extends AbstractNeuron {
 	 *Il link in ingresso viene aggiunto nel costruttore e il set non può essere più modificato.*/
 	
 	public InputNeuron(){
-		super();
+		super(ActivationFunctions.IDENTITY);
 		this.bias = 0;
 		this.inLinks.add(new InputLink());
 	}

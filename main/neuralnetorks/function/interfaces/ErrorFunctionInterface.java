@@ -1,4 +1,4 @@
-package neuralnetorks.function;
+package neuralnetorks.function.interfaces;
 
 public interface ErrorFunctionInterface {
 	

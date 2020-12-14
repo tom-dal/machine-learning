@@ -2,13 +2,14 @@ package neuralnetorks.model.neuron;
 
 import java.util.Set;
 
+import neuralnetorks.enums.ActivationFunctions;
 import neuralnetorks.model.link.AbstractLink;
 import neuralnetorks.utils.MathUtilities;
 
 public class Neuron extends AbstractNeuron{
 	
-	public Neuron() {
-		super();
+	public Neuron(ActivationFunctions activationFunction) {
+		super(activationFunction);
 		this.bias = MathUtilities.getRandomDouble();
 	}
 		

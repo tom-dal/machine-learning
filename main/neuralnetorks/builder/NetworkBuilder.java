@@ -4,7 +4,9 @@ package neuralnetorks.builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import neuralnetorks.enums.ActivationFunctions;
 import neuralnetorks.enums.Models;
+import neuralnetorks.function.interfaces.ActivationFunctionInterface;
 import neuralnetorks.model.Network;
 import neuralnetorks.model.layer.DeepLayer;
 import neuralnetorks.model.layer.InputLayer;
@@ -78,8 +80,11 @@ public class NetworkBuilder {
 
 	private void convertLastLayerToOutput() {
 		int neuronsNumber = network.getLayers().getLast().getNeurons().size();
+		ActivationFunctions activationFunction = Enum.valueOf(ActivationFunctions.class, 
+				network.getLayers().getLast().getNeurons().stream().findAny().get().getActivationFunction()
+				.getClass().getSimpleName().toUpperCase());
 		network.getLayers().removeLast();
-		OutputLayer outputLayer = new OutputLayer(neuronsNumber);
+		OutputLayer outputLayer = new OutputLayer(neuronsNumber, activationFunction);
 		outputLayer.setPrevious(network.getLayers().getLast());
 		network.getLayers().getLast().setNext(outputLayer);
 		network.getLayers().add(outputLayer);
@@ -96,9 +101,9 @@ public class NetworkBuilder {
 		linksNumber++;
 	}
 
-	public NetworkBuilder addLayer(int numberOfNeurons) {
+	public NetworkBuilder addLayer(int numberOfNeurons, ActivationFunctions activationFunction) {
 		if (!network.getLayers().isEmpty() && newLayerIndex != 0) /*E' un double check*/ { 
-			DeepLayer newLayer = new DeepLayer(numberOfNeurons);
+			DeepLayer newLayer = new DeepLayer(numberOfNeurons, activationFunction);
 			neuronCount += numberOfNeurons;
 			newLayer.setPrevious(network.getLayers().getLast());
 			network.getLayers().getLast().setNext(newLayer);
@@ -114,6 +119,10 @@ public class NetworkBuilder {
 			logger.trace("Added input layer with {} neurons", numberOfNeurons);
 			return this;
 		}
+	}
+	
+	public NetworkBuilder addLayer(int numberOfNeurons) {
+		return addLayer(numberOfNeurons, ActivationFunctions.IDENTITY);
 	}
 
 	public NetworkBuilder setNetworkName(String networkName) {

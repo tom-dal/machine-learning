@@ -1,5 +1,6 @@
-package neuralnetorks.function;
+package neuralnetorks.function.error;
 
+import neuralnetorks.function.interfaces.ErrorFunctionInterface;
 import neuralnetorks.utils.MathUtilities;
 
 public class MeanSquaredError implements ErrorFunctionInterface {

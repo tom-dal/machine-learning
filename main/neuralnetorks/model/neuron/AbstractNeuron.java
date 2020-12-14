@@ -3,6 +3,8 @@ package neuralnetorks.model.neuron;
 import java.util.HashSet;
 import java.util.Set;
 
+import neuralnetorks.enums.ActivationFunctions;
+import neuralnetorks.function.interfaces.ActivationFunctionInterface;
 import neuralnetorks.model.layer.AbstractLayer;
 import neuralnetorks.model.link.AbstractLink;
 
@@ -16,11 +18,14 @@ public abstract class AbstractNeuron {
 	protected double bias;
 	protected double nextBias;
 	
+	protected ActivationFunctionInterface activationFunction;
+
 	protected AbstractLayer layer;
 	
-	protected AbstractNeuron() {
+	protected AbstractNeuron(ActivationFunctions activationFunction) {
 		this.inLinks = new HashSet<>();
 		this.outLinks = new HashSet<>();
+		this.activationFunction = ActivationFunctionInterface.getInstance(activationFunction);
 	}
 
 	public AbstractLayer getLayer() {
@@ -52,9 +57,12 @@ public abstract class AbstractNeuron {
 		this.bias = nextBias;
 	}
 
+	public ActivationFunctionInterface getActivationFunction() {
+		return activationFunction;
+	}
 
 	public void process(int index) {
-		double output = bias + inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum();
+		double output = activationFunction.apply(bias + inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum());
 		outLinks.forEach(link -> {
 			link.setValue(output);
 			link.addToValueBatch(output,index);
@@ -62,7 +70,7 @@ public abstract class AbstractNeuron {
 	}
 	
 	public void process() {
-		double output = bias + inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum();
+		double output = activationFunction.apply(bias + inLinks.stream().mapToDouble(link -> link.getValue() * link.getWeight()).sum());
 		outLinks.forEach(link -> link.setValue(output));
 	}
 

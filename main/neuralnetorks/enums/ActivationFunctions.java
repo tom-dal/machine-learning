@@ -1,0 +1,8 @@
+package neuralnetorks.enums;
+
+public enum ActivationFunctions {
+	IDENTITY,
+	SIGMOID,
+	TANH,
+	RELU,
+}

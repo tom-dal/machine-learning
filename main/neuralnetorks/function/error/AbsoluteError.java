@@ -1,5 +1,6 @@
-package neuralnetorks.function;
+package neuralnetorks.function.error;
 
+import neuralnetorks.function.interfaces.ErrorFunctionInterface;
 
 public class AbsoluteError implements ErrorFunctionInterface {
 
