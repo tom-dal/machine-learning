@@ -12,13 +12,13 @@ public class Test2 {
 
 	public static void main(String[] args) {
 
-		double[] inputData = new double[800];
+		double[] inputData = new double[500];
 
-		double[] targetData = new double[800];
+		double[] targetData = new double[500];
 
 		for (int i = 0; i < inputData.length; i++) {
 			inputData[i] = i;
-			targetData[i] = 33 + 23.1 * i;
+			targetData[i] = testFunction(i);
 		}
 
 		NetworkBuilder builder = new NetworkBuilder(Models.LINEAR_REGRESSION);
@@ -40,12 +40,12 @@ public class Test2 {
 		}
 		
 		
-		lc.setLearningRate(0.0000001);
+		lc.setLearningRate(0.0001);
 		lc.configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_CENTERING, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_NORMALIZATION, true);
 		lc.configuration(ErrorFunctions.MEAN_SQUARED_ERROR);
-
+  
 		lc.learn(inputDataArray, targetDataArray, 300);
 	
 //		lc.setInitialDiffStep(0.00000001);
@@ -56,7 +56,7 @@ public class Test2 {
 		for (int i = 0; i < 10; i++) {
 			test[0] = i * 10;
 			double[] prediction = lc.predict(test);
-			double actual = 33 + 23.1 * test[0];
+			double actual = testFunction(test[0]);
 			System.out.println("Input: " + test[0] + "  Predicted: " + prediction[0] + "    Actual: "
 					+ actual + "   Error%: " + Math.abs((actual - prediction[0])/actual)*100);
 
@@ -66,4 +66,8 @@ public class Test2 {
 		
 		
 		}
+	
+	private static double testFunction(double input) {
+		return 1 + 2.1 * input;
+	}
 }

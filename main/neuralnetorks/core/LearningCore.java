@@ -48,8 +48,6 @@ public class LearningCore {
 	private double[] targetAverage;
 	private double[] targetMin;
 	private double[] targetSpan;
-	private boolean inputNormalized = false;
-	private boolean targetNormalized = false;
 
 	static int index = 0;
 
@@ -124,11 +122,9 @@ public class LearningCore {
 		}
 		if (options.get(NetworkOptions.INPUT_BATCH_NORMALIZATION)) {
 			MathUtilities.normalizeBatch(inputBatch, inputSpan, inputMin);
-			inputNormalized = true;
 		}
 		if (options.get(NetworkOptions.TARGET_BATCH_NORMALIZATION)) {
 			MathUtilities.normalizeBatch(targetBatch, targetSpan, targetMin);
-			targetNormalized = true;
 		}
 
 		setLinkValueBatchSize(inputBatchLength);
@@ -230,14 +226,13 @@ public class LearningCore {
 					double slope = calculateWeightSlope(inLink, err);
 					logger.debug("Calculated error/weight slope for link  {} --> {}:  {})", inLink.getFromNeuron().getId(),
 							inLink.getToNeuron().getId(), slope);
-					inLink.setNextWeight(inLink.getWeight() - slope * learningRate);
+					inLink.setNextWeight(inLink.getWeight() - slope * learningRate );
 				});
 
 				double slope = calculateBiasSlope(neuron, err);
 				logger.debug("Calculated error/bias slope for neuron {}:  {})", neuron.getId(), slope);
 				neuron.setNextBias(neuron.getBias() - slope * learningRate);
 			});
-
 			currentLayer = currentLayer.getPrevious();
 		}
 		
@@ -270,13 +265,13 @@ public class LearningCore {
 				}
 			}
 			double slope = (newErr - err) / diffStep;
+			neuron.setBias(biasSave);
 			return slope;
 		} else {
 			double slope = Math.sqrt(err * inputBatchLength) / inputBatchLength;
-			double propagationFactor = getPropagationFactor(neuron);
-			slope *= propagationFactor;
+			slope *= getPropagationFactor(neuron);
 			slope *= inputBatchLength;
-			logger.debug("Neuron {} propagation factor: {}", neuron.getId(), propagationFactor);
+			logger.trace("Neuron {} propagation factor: {}", neuron.getId(), getPropagationFactor(neuron));
 			return slope;
 		}
 	}
@@ -340,8 +335,7 @@ public class LearningCore {
 			return slope;
 		} else {
 			double slope = Math.sqrt(err * inputBatchLength) / inputBatchLength;
-			double propagationFactor = getPropagationFactor(link.getToNeuron());
-			slope *= propagationFactor;
+			slope *= getPropagationFactor(link.getToNeuron());
 			slope *= Arrays.stream(link.getValueBatch()).sum();
 			return slope;
 		}
