@@ -23,7 +23,13 @@ public class Test2 {
 
 		NetworkBuilder builder = new NetworkBuilder(Models.LINEAR_REGRESSION);
 
-		builder.addLayer(1).addLayer(3).addLayer(1).setInputSize(1).setNetworkName("Asghenauei");
+		builder
+		.addLayer(1)
+		.addLayer(1)
+		.addLayer(2)
+		.addLayer(1)
+		.setInputSize(1)
+		.setNetworkName("Test regressione lineare");
 
 		Network network = builder.getNetwork();
 
@@ -40,7 +46,7 @@ public class Test2 {
 		}
 		
 		
-		lc.setLearningRate(0.0001);
+		lc.setLearningRate(0.00001);
 		lc.configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_CENTERING, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_NORMALIZATION, true);

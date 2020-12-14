@@ -62,7 +62,7 @@ public class LearningCore {
 		/* DEFAULT CONFIGURATIONS */
 		this.learningRate = 0.001;
 		configuration(ErrorFunctions.MEAN_SQUARED_ERROR);
-		this.initialDiffStep = 10e-15;
+		this.initialDiffStep = 10e-18;
 	}
 
 	public void setLearningRate(double learningRate) {
@@ -133,10 +133,10 @@ public class LearningCore {
 		for (int i = 0; i < iterations; i++) {
 			double[][] outputBatch = iterateForwardPropagationOverInputBatch();
 			double err = errorFunction.getError(outputBatch, targetData);
-			if (err > lastErr && i != 0) {
-				logger.warn("Error has increased in last iteration {}.", i + 1);
-				initialDiffStep *= 10;
-			}
+//			if (err > lastErr && i != 0) {
+//				logger.warn("Error has increased in last iteration {}.", i + 1);
+//				initialDiffStep *= 10;
+//			}
 			lastErr = err;
 			if (i < 10 || (((i + 1) % 10) == 0)) {
 				checkForErrors();
