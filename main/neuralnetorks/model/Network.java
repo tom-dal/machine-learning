@@ -9,9 +9,18 @@ import neuralnetorks.model.layer.OutputLayer;
 
 public class Network {
 	
+	private String name;
+
 	private Models model;
 	
 	private LinkedList<AbstractLayer> layers = new LinkedList<>();
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
 	
 	public LinkedList<AbstractLayer> getLayers() {
 		return layers;

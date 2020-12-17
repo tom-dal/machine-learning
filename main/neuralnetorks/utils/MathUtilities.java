@@ -177,20 +177,22 @@ public class MathUtilities {
 		}
 	}
 
-	public static void normalizeSingleInput(double[] input, double[] inputMin, double[] inputSpan) {
-		for (int i = 0; i < inputSpan.length; i++) {
-			input[i] = (input[i] - inputMin[i])/inputSpan[i];
+	public static void normalizeSingleInput(double[] value, double[] min, double[] span) {
+		for (int i = 0; i < value.length; i++) {
+			value[i] = (value[i] - min[i])/span[i];
 		}
 	}
 
-	public static void revertNormalization(double[] output, double[] inputMin, double[] inputSpan) {
-		// TODO Auto-generated method stub
-		
+	public static void revertNormalization(double[] value, double[] min, double[] span) {
+		for (int i = 0; i < value.length; i++) {
+			value[i] = value[i]*span[i] + min[i];
+		}
 	}
 
-	public static void revertCentering(double[] output, double[] inputAverage) {
-		// TODO Auto-generated method stub
-		
+	public static void revertCentering(double[] value, double[] average) {
+		for (int i = 0; i < value.length; i++) {
+			value[i] += average[i];
+		}
 	}
 
 }

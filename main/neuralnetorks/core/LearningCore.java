@@ -13,6 +13,7 @@ import neuralnetorks.enums.ErrorFunctions;
 import neuralnetorks.enums.Models;
 import neuralnetorks.enums.NetworkOptions;
 import neuralnetorks.exception.InputCompilingException;
+import neuralnetorks.function.error.AbsoluteError;
 import neuralnetorks.function.error.MeanSquaredError;
 import neuralnetorks.function.interfaces.ErrorFunctionInterface;
 import neuralnetorks.model.Network;
@@ -85,7 +86,7 @@ public class LearningCore {
 			this.errorFunction = new MeanSquaredError();
 		}
 		else if (errorFunction.equals(ErrorFunctions.ABSOLUTE_ERROR)) {
-			this.errorFunction = new MeanSquaredError();
+			this.errorFunction = new AbsoluteError();
 		}
 	}
 
@@ -117,7 +118,7 @@ public class LearningCore {
 
 		if (options.get(NetworkOptions.INPUT_BATCH_CENTERING)) {
 			inputAverage = MathUtilities.average(inputBatch);
-			MathUtilities.center(inputBatch, inputAverage); /* da testare */
+			MathUtilities.center(inputBatch, inputAverage); 
 		}
 		if (options.get(NetworkOptions.TARGET_BATCH_CENTERING)) {
 			targetAverage = MathUtilities.average(targetBatch);

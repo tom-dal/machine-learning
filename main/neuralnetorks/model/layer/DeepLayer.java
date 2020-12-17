@@ -13,9 +13,9 @@ public class DeepLayer extends AbstractLayer {
 		this.id = IdUtil.getNextDeepLayerNumber().toString();
 		for (int i = 0; i < numberOfNeurons; i++) {
 			neurons.add(new Neuron(activationFunction));
-			neuronCount++;
 		}
 		neurons.forEach(n -> {
+			neuronCount++;
 			n.setLayer(this);
 			n.setId(neuronCount + "-L" + this.id);
 		});

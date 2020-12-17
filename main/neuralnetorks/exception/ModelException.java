@@ -1,4 +1,4 @@
-package neuralnetorks;
+package neuralnetorks.exception;
 
 public class ModelException extends RuntimeException {
 	

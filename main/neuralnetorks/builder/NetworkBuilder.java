@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 
 import neuralnetorks.enums.ActivationFunctions;
 import neuralnetorks.enums.Models;
-import neuralnetorks.function.interfaces.ActivationFunctionInterface;
 import neuralnetorks.model.Network;
 import neuralnetorks.model.layer.DeepLayer;
 import neuralnetorks.model.layer.InputLayer;
@@ -20,20 +19,17 @@ public class NetworkBuilder {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private Network network;
-	private String networkName;
+	
 	private int newLayerIndex = 0;
 	int neuronCount = 0;
 	int paramsCount = 0;
 	int linksNumber = 0;
 	private boolean inputSizeSet = false;
 
-	private Models model;
 
 	public NetworkBuilder(Models model) {
-		this.model = model;
-		if (model.equals(Models.LINEAR_REGRESSION)) {
-			this.network = new Network();
-		}
+		this.network = new Network();
+		this.network.setModel(model);
 	}
 
 	public Network getNetwork() {
@@ -45,12 +41,12 @@ public class NetworkBuilder {
 		if (!inputSizeSet) {
 			logger.error(
 					"Cannot initialize network{}: input size unknown. Invoke method setInputSize() to set input size.",
-					networkName != null ? " " + networkName : "");
+					network.getName() != null ? " " + network.getName() : "");
 			return this;
 		}
-		if (model.equals(Models.LINEAR_REGRESSION) && network.getLayers().getLast().getNeurons().size() != 1) {
+		if (network.getModel().equals(Models.LINEAR_REGRESSION) && network.getLayers().getLast().getNeurons().size() != 1) {
 			logger.error("Cannot initialize network{}: output layer must have one neuron in linear regression model.",
-					networkName != null ? " " + networkName : "");
+					network.getName() != null ? " " + network.getName() : "");
 		}
 		
 		convertLastLayerToOutput();
@@ -64,7 +60,7 @@ public class NetworkBuilder {
 		});
 
 		logger.info("Initialized network{} with {} input parameter(s) and {} output parameter(s).",
-				networkName != null ? " " + networkName : "", network.getLayers().getFirst().getNeurons().size(),
+				network.getName() != null ? " " + network.getName() : "", network.getLayers().getFirst().getNeurons().size(),
 				network.getLayers().getLast().getNeurons().size());
 		for (int i = 1; i < network.getLayers().size()-1; i++) {
 			logger.info("Deep layer {} has {} neurons.", i , network.getLayers().get(i).getNeurons().size());
@@ -126,7 +122,7 @@ public class NetworkBuilder {
 	}
 
 	public NetworkBuilder setNetworkName(String networkName) {
-		this.networkName = networkName;
+		network.setName(networkName);
 		return this;
 	}
 

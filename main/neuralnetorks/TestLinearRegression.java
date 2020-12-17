@@ -2,13 +2,14 @@ package neuralnetorks;
 
 import neuralnetorks.builder.NetworkBuilder;
 import neuralnetorks.core.LearningCore;
+import neuralnetorks.enums.ActivationFunctions;
 import neuralnetorks.enums.ErrorFunctions;
 import neuralnetorks.enums.Models;
 import neuralnetorks.enums.NetworkOptions;
 import neuralnetorks.model.Network;
 import neuralnetorks.utils.MathUtilities;
 
-public class Test2 {
+public class TestLinearRegression {
 
 	public static void main(String[] args) {
 
@@ -25,7 +26,7 @@ public class Test2 {
 
 		builder
 		.addLayer(1)
-		.addLayer(1)
+		.addLayer(3)
 		.addLayer(2)
 		.addLayer(1)
 		.setInputSize(1)
@@ -46,13 +47,13 @@ public class Test2 {
 		}
 		
 		
-		lc.setLearningRate(0.00001);
+		lc.setLearningRate(0.00005);
 		lc.configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_CENTERING, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_NORMALIZATION, true);
 		lc.configuration(ErrorFunctions.MEAN_SQUARED_ERROR);
   
-		lc.learn(inputDataArray, targetDataArray, 300);
+		lc.learn(inputDataArray, targetDataArray, 2);
 	
 //		lc.setInitialDiffStep(0.00000001);
 //		lc.learn(100);
