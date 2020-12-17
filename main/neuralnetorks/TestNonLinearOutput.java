@@ -27,7 +27,7 @@ public class TestNonLinearOutput {
 		builder
 		.addLayer(1)
 		.addLayer(3, ActivationFunctions.TANH)
-		.addLayer(4, ActivationFunctions.TANH)
+		.addLayer(2, ActivationFunctions.TANH)
 		.addLayer(1)
 		.setInputSize(1)
 		.setNetworkName("Test appendimento funzione non lineare");
@@ -47,18 +47,16 @@ public class TestNonLinearOutput {
 		}
 		
 		
-		lc.setLearningRate(0.0000000000000000000000001);
+		lc.setLearningRate(10e-29);
 		lc.configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_CENTERING, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_NORMALIZATION, false);
 		lc.configuration(NetworkOptions.TARGET_BATCH_CENTERING, true);
-//		lc.configuration(NetworkOptions.TARGET_BATCH_NORMALIZATION, true);
+		lc.configuration(NetworkOptions.TARGET_BATCH_NORMALIZATION, true);
 		lc.configuration(ErrorFunctions.MEAN_SQUARED_ERROR);
   
-		lc.learn(inputDataArray, targetDataArray, 50);
+		lc.learn(inputDataArray, targetDataArray, 150);
 	
-		lc.setLearningRate(0.00000000000000000000000001);
-		lc.learn(100);
 		
 		double[] test = new double [1];
 

@@ -195,4 +195,37 @@ public class MathUtilities {
 		}
 	}
 
+	public static double absoluteError(double[][] outputData, double[][] targetData) {
+		double[][] outputBatch = copy2dArray(outputData);
+		double[][] targetBatch = copy2dArray(targetData);
+		double[] error = new double[targetData[0].length];
+		for (int i = 0; i < error.length; i++) {
+			error[i] = 0;
+			for (int j = 0; j < targetData.length; j++) {
+				error[i] += Math.abs(outputBatch[j][i] - targetBatch[j][i]);
+			}
+		}
+		if (error.length>1) {
+			error = normalizeArray(error);
+		}
+		return Arrays.stream(error).sum();
+	}
+
+	public static double meanAbsoluteError(double[][] outputData, double[][] targetData) {
+		double[][] outputBatch = copy2dArray(outputData);
+		double[][] targetBatch = copy2dArray(targetData);
+		double[] error = new double[targetData[0].length];
+		for (int i = 0; i < error.length; i++) {
+			error[i] = 0;
+			for (int j = 0; j < targetData.length; j++) {
+				error[i] += Math.abs(outputBatch[j][i] - targetBatch[j][i]);
+			}
+			error[i] /= targetData.length;
+		}
+		if (error.length>1) {
+			error = normalizeArray(error);
+		}
+		return Arrays.stream(error).sum();
+	}
+
 }

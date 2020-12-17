@@ -82,12 +82,7 @@ public class LearningCore {
 	}
 
 	public void configuration(ErrorFunctions errorFunction) {
-		if (errorFunction.equals(ErrorFunctions.MEAN_SQUARED_ERROR)) {
-			this.errorFunction = new MeanSquaredError();
-		}
-		else if (errorFunction.equals(ErrorFunctions.ABSOLUTE_ERROR)) {
-			this.errorFunction = new AbsoluteError();
-		}
+		this.errorFunction = ErrorFunctionInterface.getInstance(errorFunction);
 	}
 
 	public void learn(double[][] inputData, double[][] targetData, int iterations) {
@@ -137,10 +132,9 @@ public class LearningCore {
 		for (int i = 0; i < iterations; i++) {
 			double[][] outputBatch = iterateForwardPropagationOverInputBatch();
 			double err = errorFunction.getError(outputBatch, targetData);
-//			if (err > lastErr && i != 0) {
-//				logger.warn("Error has increased in last iteration {}.", i + 1);
-//				initialDiffStep *= 10;
-//			}
+			if (err > lastErr && i != 0) {
+				logger.warn("Error has increased in last iteration ({}).", i + 1);
+			}
 			lastErr = err;
 			if (i < 10 || (((i + 1) % 10) == 0)) {
 				checkForErrors();
