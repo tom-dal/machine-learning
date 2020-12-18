@@ -4,5 +4,7 @@ public enum ActivationFunctions {
 	IDENTITY,
 	SIGMOID,
 	TANH,
-	RELU,
+	ReLU,
+	LReLU,
+	ELU
 }

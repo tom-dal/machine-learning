@@ -1,7 +1,6 @@
 package neuralnetorks.core;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -13,21 +12,17 @@ import neuralnetorks.enums.ErrorFunctions;
 import neuralnetorks.enums.Models;
 import neuralnetorks.enums.NetworkOptions;
 import neuralnetorks.exception.InputCompilingException;
-import neuralnetorks.function.error.AbsoluteError;
-import neuralnetorks.function.error.MeanSquaredError;
 import neuralnetorks.function.interfaces.ErrorFunctionInterface;
 import neuralnetorks.model.Network;
 import neuralnetorks.model.layer.AbstractLayer;
-import neuralnetorks.model.layer.DeepLayer;
-import neuralnetorks.model.layer.InputLayer;
 import neuralnetorks.model.layer.OutputLayer;
 import neuralnetorks.model.link.AbstractLink;
 import neuralnetorks.model.link.Link;
 import neuralnetorks.model.neuron.AbstractNeuron;
-import neuralnetorks.model.neuron.Neuron;
 import neuralnetorks.model.neuron.OutputNeuron;
 import neuralnetorks.model.neuron.InputNeuron;
 import neuralnetorks.utils.MathUtilities;
+import neuralnetorks.config.Configuration;
 
 public class LearningCore {
 
@@ -61,9 +56,9 @@ public class LearningCore {
 		this.options = Arrays.stream(NetworkOptions.values())
 				.collect(Collectors.toMap(option -> option, option -> false));
 		/* DEFAULT CONFIGURATIONS */
-		this.learningRate = 0.001;
+		this.learningRate = Configuration.DEFAULT_LEARNING_RATE;
 		configuration(ErrorFunctions.MEAN_SQUARED_ERROR);
-		this.initialDiffStep = 10e-18;
+		this.initialDiffStep = Configuration.INITIAL_DIFF_STEP;
 	}
 
 	public void setLearningRate(double learningRate) {

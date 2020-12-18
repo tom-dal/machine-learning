@@ -1,20 +1,21 @@
-package neuralnetorks;
+package neuralnetorks.test;
 
 import neuralnetorks.builder.NetworkBuilder;
 import neuralnetorks.core.LearningCore;
+import neuralnetorks.enums.ActivationFunctions;
 import neuralnetorks.enums.ErrorFunctions;
 import neuralnetorks.enums.Models;
 import neuralnetorks.enums.NetworkOptions;
 import neuralnetorks.model.Network;
 import neuralnetorks.utils.MathUtilities;
 
-public class TestLinearRegression {
+public class Test_NonLinearFunction{
 
 	public static void main(String[] args) {
 
-		double[] inputData = new double[500];
+		double[] inputData = new double[200];
 
-		double[] targetData = new double[500];
+		double[] targetData = new double[200];
 
 		for (int i = 0; i < inputData.length; i++) {
 			inputData[i] = i;
@@ -25,11 +26,11 @@ public class TestLinearRegression {
 
 		builder
 		.addLayer(1)
-		.addLayer(3)
-		.addLayer(2)
+		.addLayer(5, ActivationFunctions.LReLU)
+		.addLayer(5, ActivationFunctions.LReLU)
 		.addLayer(1)
 		.setInputSize(1)
-		.setNetworkName("Test regressione lineare");
+		.setNetworkName("Test appendimento funzione non lineare");
 
 		Network network = builder.getNetwork();
 
@@ -46,15 +47,17 @@ public class TestLinearRegression {
 		}
 		
 		
-		lc.setLearningRate(5e-5);
+		lc.setLearningRate(10e-8);
 		lc.configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_CENTERING, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_NORMALIZATION, true);
+		lc.configuration(NetworkOptions.TARGET_BATCH_CENTERING, true);
+		lc.configuration(NetworkOptions.TARGET_BATCH_NORMALIZATION, true);
 		lc.configuration(ErrorFunctions.MEAN_SQUARED_ERROR);
   
-		lc.learn(inputDataArray, targetDataArray, 150);
-		
+		lc.learn(inputDataArray, targetDataArray, 200);
 	
+		
 		double[] test = new double [1];
 
 		for (int i = 0; i < 10; i++) {
@@ -72,6 +75,6 @@ public class TestLinearRegression {
 		}
 	
 	private static double testFunction(double input) {
-		return 1 + 2.1 * input;
+		return 50 + input*input;
 	}
 }
