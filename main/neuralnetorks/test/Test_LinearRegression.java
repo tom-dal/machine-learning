@@ -24,11 +24,10 @@ public class Test_LinearRegression {
 		NetworkBuilder builder = new NetworkBuilder(Models.LINEAR_REGRESSION);
 
 		builder
-		.addLayer(1)
+		.addInputLayer(1)
 		.addLayer(3)
 		.addLayer(2)
-		.addLayer(1)
-		.setInputSize(1)
+		.addOutputLayer(1)
 		.setNetworkName("Test regressione lineare");
 
 		Network network = builder.getNetwork();

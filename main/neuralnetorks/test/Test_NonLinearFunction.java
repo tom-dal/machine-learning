@@ -51,8 +51,6 @@ public class Test_NonLinearFunction{
 		lc.configuration(NetworkOptions.NUMERICAL_DIFFERENTIATION, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_CENTERING, true);
 		lc.configuration(NetworkOptions.INPUT_BATCH_NORMALIZATION, true);
-		lc.configuration(NetworkOptions.TARGET_BATCH_CENTERING, true);
-		lc.configuration(NetworkOptions.TARGET_BATCH_NORMALIZATION, true);
 		lc.configuration(ErrorFunctions.MEAN_SQUARED_ERROR);
   
 		lc.learn(inputDataArray, targetDataArray, 200);
